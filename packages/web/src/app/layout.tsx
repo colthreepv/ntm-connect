@@ -17,10 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ClientAuthProvider>
-          {children}
-        </ClientAuthProvider>
+      <body className={`dark bg-gray-100 dark:bg-neutral-800 ${inter.className}`}>
+        <ClientAuthProvider>{children}</ClientAuthProvider>
       </body>
     </html>
   )
