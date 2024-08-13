@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ClientAuthProvider } from './login/client-auth-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`dark bg-gray-100 dark:bg-neutral-800 ${inter.className}`}>
-        <ClientAuthProvider>{children}</ClientAuthProvider>
-      </body>
+      <body className={`dark bg-gray-100 dark:bg-neutral-800 ${inter.className}`}>{children}</body>
     </html>
   )
 }

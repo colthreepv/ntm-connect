@@ -1,27 +1,33 @@
 'use client'
 
-import { useAuth } from './login/auth-context'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from './login/auth-store'
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const router = useRouter()
+  const { user, loading } = useAuthStore((state) => ({ user: state.user, loading: state.loading }))
 
-  if (loading)
-    return <div>Loading...</div>
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [user, loading, router])
 
   return (
-    <main>
-      {user
-        ? (
-            <p>
-              Welcome,
-              {user.email}
-              !
-            </p>
-          )
-        : (
-            <a href="/login">Please log in</a>
-          )}
-      {/* Rest of your component */}
+    <main className="container mx-auto">
+      {loading && (
+        <p
+          className="h-4 rounded-full bg-gray-200 dark:bg-neutral-700"
+          style={{ width: '40%' }}
+        ></p>
+      )}
+      {user && (
+        <p className="text-white">
+          Welcome,
+          {user.email}!
+        </p>
+      )}
     </main>
   )
 }
