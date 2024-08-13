@@ -10,7 +10,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-const app = initializeApp(firebaseConfig)
-const firebaseAuth = getAuth(app)
+const firebaseApp = initializeApp(firebaseConfig)
+const firebaseAuth = getAuth(firebaseApp)
 
-export { firebaseAuth }
+export { firebaseApp, firebaseAuth }

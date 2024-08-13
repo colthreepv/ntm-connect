@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from './login/auth-store'
 import Navbar from './navbar'
-import StoreTable from './store-table'
+import StoreTable, { SkeletonTable } from './store-table'
 
 export default function Home() {
   const router = useRouter()
@@ -20,12 +20,7 @@ export default function Home() {
     <div>
       <Navbar />
       <main className="container mx-auto">
-        {loading && (
-          <p
-            className="h-4 rounded-full bg-gray-200 dark:bg-neutral-700"
-            style={{ width: '40%' }}
-          ></p>
-        )}
+        {loading && <SkeletonTable />}
         {user && <StoreTable />}
       </main>
     </div>
