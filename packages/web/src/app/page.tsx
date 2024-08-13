@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from './login/auth-store'
 import Navbar from './navbar'
+import StoreTable from './store-table'
 
 export default function Home() {
   const router = useRouter()
@@ -25,12 +26,7 @@ export default function Home() {
             style={{ width: '40%' }}
           ></p>
         )}
-        {user && (
-          <p className="text-white">
-            Welcome,
-            {user.email}!
-          </p>
-        )}
+        {user && <StoreTable />}
       </main>
     </div>
   )
