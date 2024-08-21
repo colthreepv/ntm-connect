@@ -4,5 +4,9 @@
   "prettier.enable": true,
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "files.associations": {
+    "**/.env*": "plaintext",
+    "**/*.env*": "plaintext"
   }
 }
