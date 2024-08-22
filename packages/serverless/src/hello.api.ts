@@ -1,6 +1,7 @@
 import type { HttpFunction } from '@google-cloud/functions-framework'
-import { firebaseAdminAuth } from '../firebase.js'
+import { firebaseAdminAuth } from './firebase.js'
 
+// This is an example route that requires authentication
 export const hello: HttpFunction = async (req, res) => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

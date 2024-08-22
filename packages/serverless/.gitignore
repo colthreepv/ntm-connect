@@ -3,3 +3,6 @@ dist
 .env.*
 .env
 !.env.example.sh
+
+# llm-context
+llm-context.*.txt

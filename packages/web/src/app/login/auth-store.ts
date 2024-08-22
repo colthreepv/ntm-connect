@@ -12,6 +12,7 @@ interface AuthState {
 interface AuthActions {
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
+  userToken: () => Promise<string>
 }
 
 type AuthStore = AuthState & AuthActions
@@ -38,6 +39,13 @@ export const useAuthStore = createAuthStore<AuthStore>(
       catch (error) {
         set({ error: (error as FirebaseError).code, loading: false })
       }
+    },
+    userToken: async () => {
+      const user = firebaseAuth.currentUser
+      if (!user) {
+        throw new Error('No authenticated user')
+      }
+      return await user.getIdToken()
     },
   }),
   { name: 'auth-store', enabled: process.env.NODE_ENV === 'development' },

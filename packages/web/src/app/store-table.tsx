@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore'
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
 import { firebaseApp } from './login/firebase' // Adjust this import path as needed
+import { useAuthStore } from './login/auth-store'
 
 interface SalePointData {
   group: string
@@ -106,6 +107,7 @@ export function SkeletonTable() {
 export default function StoreTable() {
   const [salePoints, setSalePoints] = useState<SalePoint[]>([])
   const [loading, setLoading] = useState(true)
+  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
 
   useEffect(() => {
     const fetchSalePoints = async () => {
@@ -130,6 +132,12 @@ export default function StoreTable() {
 
     fetchSalePoints()
   }, [])
+
+  const handleRowClick = async (salePoint: SalePoint) => {
+    console.log('Row clicked:', salePoint)
+    const userToken = await getUserToken()
+    console.log('User token:', userToken)
+  }
 
   if (loading) return <SkeletonTable />
 
@@ -233,7 +241,8 @@ export default function StoreTable() {
                   {salePoints.map((salePoint) => (
                     <tr
                       key={salePoint.storeId}
-                      className="bg-white hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                      className="cursor-pointer bg-white hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                      onClick={() => handleRowClick(salePoint)}
                     >
                       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
                         {salePoint.group}
