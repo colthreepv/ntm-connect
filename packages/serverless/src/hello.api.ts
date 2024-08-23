@@ -1,22 +1,21 @@
 import type { HttpFunction } from '@google-cloud/functions-framework'
-import { firebaseAdminAuth } from './firebase.js'
+import type { DecodedIdToken } from 'firebase-admin/auth'
+import { validateSession } from './firebase.js'
+import { Exception } from './exception.js'
 
-// This is an example route that requires authentication
 export const hello: HttpFunction = async (req, res) => {
-  const authHeader = req.headers.authorization
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
-  }
-
-  const token = authHeader.split('Bearer ')[1]
-
+  let decodedClaims: DecodedIdToken
   try {
-    await firebaseAdminAuth.verifyIdToken(token)
-    res.json({ message: 'Hello World' })
+    decodedClaims = await validateSession(req)
   }
   catch (error) {
-    console.error('Error verifying token:', error)
-    res.status(401).json({ error: 'Unauthorized' })
+    if (error instanceof Exception) {
+      return res.status(401).json({ error: error.message })
+    }
+
+    console.error('Unexpected error:', error)
+    return res.status(502).json({ error: 'Unexpected error' })
   }
+
+  return res.json({ message: 'Hello World', userId: decodedClaims.uid })
 }
