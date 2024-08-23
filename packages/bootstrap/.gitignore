@@ -2,3 +2,5 @@
 service-account.json
 # file to ingest
 data.json
+
+llm-context*

@@ -30,18 +30,36 @@ function readJSONFile(filePath) {
   }
 }
 
-async function uploadToFirestore(collectionName, data) {
+async function uploadToFirestore(backendCollection, frontendCollection, data) {
   const batch = db.batch()
 
   data.forEach((item) => {
     const customId = generateCustomId(item)
-    const docRef = db.collection(collectionName).doc(customId)
-    batch.set(docRef, item)
+
+    // Backend collection with sensitive data
+    const backendDocRef = db.collection(backendCollection).doc(customId)
+    batch.set(backendDocRef, {
+      ...item,
+      publicIp: item.publicIp,
+      username: item.username,
+      password: item.password,
+      email: item.email,
+    })
+
+    // Frontend collection with less sensitive data
+    const frontendDocRef = db.collection(frontendCollection).doc(customId)
+    batch.set(frontendDocRef, {
+      company: item.company,
+      group: item.group,
+      storeId: item.storeId,
+      storeFullName: item.storeFullName,
+      deviceType: item.deviceType,
+    })
   })
 
   try {
     await batch.commit()
-    console.log(`Successfully uploaded ${data.length} documents to ${collectionName}`)
+    console.log(`Successfully uploaded ${data.length} documents to ${backendCollection} and ${frontendCollection}`)
   }
   catch (error) {
     console.error('Error uploading to Firestore:', error)
@@ -50,11 +68,12 @@ async function uploadToFirestore(collectionName, data) {
 
 async function main() {
   const jsonFilePath = 'data.json'
-  const collectionName = 'salePoint'
+  const backendCollectionName = 'salePointCredentials'
+  const frontendCollectionName = 'salePoint'
 
   const jsonData = readJSONFile(jsonFilePath)
   if (jsonData) {
-    await uploadToFirestore(collectionName, jsonData)
+    await uploadToFirestore(backendCollectionName, frontendCollectionName, jsonData)
   }
 }
 
