@@ -7,3 +7,5 @@ export const env = cleanEnv(nodeEnv, {
   FIREBASE_CLIENT_EMAIL: str(),
   FIREBASE_PRIVATE_KEY: str(),
 })
+
+export const sessionPrefix = '/device'

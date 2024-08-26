@@ -1,7 +1,8 @@
+import { join as pathJoin } from 'node:path/posix'
 import type { HttpFunction } from '@google-cloud/functions-framework'
 import { Agent, fetch } from 'undici'
-import { firebaseAdminAuth } from '../firebase.js'
-import { env } from '../config.js'
+import { fetchSalePointCredentials, firebaseAdminAuth } from '../firebase.js'
+import { env, sessionPrefix } from '../config.js'
 import { Exception, createException } from '../exception.js'
 
 const expiresIn = 60 * 60 * 24 * 2 * 1000 // 2 days
@@ -13,9 +14,10 @@ interface SessionCookie {
 }
 
 const MissingUserTokenError = createException('ID Token is required', 'CREATE_SESSION_01')
-const CreateSessionCookieError = createException('Error creating session cookie', 'CREATE_SESSION_02')
+const CreateSessionCookieError = createException('Error creating firebase session cookie, probably expired', 'CREATE_SESSION_02')
 const DeviceLoginError = createException('Unable to login on device', 'CREATE_SESSION_03')
 const JSessionParseError = createException('Failed to parse JSESSIONID cookie', 'CREATE_SESSION_04')
+const MissingSalePointIdError = createException('SalePointId is required', 'CREATE_SESSION_05')
 
 async function getJSessionFromDevice(ip: string, username: string, password: string): Promise<SessionCookie> {
   const agent = new Agent({
@@ -28,6 +30,19 @@ async function getJSessionFromDevice(ip: string, username: string, password: str
   const formData = new URLSearchParams()
   formData.append('txtUser', username)
   formData.append('txtPassword', password)
+  formData.append('browser', 'FF')
+  formData.append('screenw', '2560')
+  formData.append('screenh', '1440')
+  formData.append('cmd', 'normal')
+  formData.append('pagetype', 'standard')
+  formData.append('txtEnterPassword', 'Inserisci la password')
+  formData.append('txtStandardPassword', 'La password deve essere composta di almeno 6 caratteri')
+  formData.append('txtStrictPassword', 'La password deve essere lunga almeno 8 caratteri, deve contenere almeno un numero e uno dei seguenti simboli: . , _ ! ? $ % &')
+  formData.append('txtConfPwdIncorrect', 'La password di conferma non è corretta')
+  formData.append('txtLanguage', 'IT_it')
+  formData.append('txtAutoLogin', '')
+  formData.append('npassword', '')
+  formData.append('cpassword', '')
 
   const response = await fetch(loginUrl, {
     method: 'POST',
@@ -39,12 +54,12 @@ async function getJSessionFromDevice(ip: string, username: string, password: str
   })
 
   if (!response.ok) {
-    throw new DeviceLoginError({ status: response.status })
+    throw new DeviceLoginError({ reason: `statusCode: ${response.status}` })
   }
 
   const setCookieHeader = response.headers.get('set-cookie')
   if (setCookieHeader == null) {
-    throw new DeviceLoginError({ details: 'Failed to obtain JSESSIONID' })
+    throw new DeviceLoginError({ reason: 'device responded without JSESSION' })
   }
 
   const regex = /^JSESSIONID=(.*?);\s*Path=(.*?);/i
@@ -54,22 +69,38 @@ async function getJSessionFromDevice(ip: string, username: string, password: str
     throw new JSessionParseError()
   }
 
+  const responseBody = await response.text()
+  if (responseBody.includes('txtPassword'))
+    throw new DeviceLoginError({ reason: 'device responded with login page' })
+
   const [, value, path] = match
 
   return {
-    name: 'JSSESSIONID',
+    name: 'JSESSIONID',
     value,
     path: path || '/',
   }
 }
 
+/**
+ * Creates a new session for the user and logs in on the device.
+ * @param req.body.userToken The Firebase ID token of the user.
+ * @param req.body.salePointId The ID of the sale point to log in on.
+ * @returns A JSON response with a success message.
+ * @throws {@link MissingUserTokenError} If the user token is missing.
+ * @throws {@link MissingSalePointIdError} If the sale point ID is missing.
+ * @throws {@link CreateSessionCookieError} If there's an error creating the session cookie.
+ * @throws {@link DeviceLoginError} If there's an error logging in on the device.
+ */
 export const createSession: HttpFunction = async (req, res) => {
   try {
-    const { userToken } = req.body
+    const { userToken, salePointId } = req.body
 
-    if (!userToken) {
+    if (userToken == null)
       throw new MissingUserTokenError()
-    }
+
+    if (salePointId == null)
+      throw new MissingSalePointIdError()
 
     let sessionCookie: string
     try {
@@ -77,23 +108,25 @@ export const createSession: HttpFunction = async (req, res) => {
     }
     catch (error) {
       console.error('Error creating session cookie:', error)
-      throw new CreateSessionCookieError({ error })
+      throw new CreateSessionCookieError({ cause: error })
     }
+
+    const credentials = await fetchSalePointCredentials(salePointId)
 
     let deviceCookie: SessionCookie
     try {
-      deviceCookie = await getJSessionFromDevice('IP', 'user', 'passwd')
+      deviceCookie = await getJSessionFromDevice(credentials.publicIp, credentials.username, credentials.password)
     }
     catch (error) {
       console.error('Unable to login on device:', error)
-      throw new DeviceLoginError({ error })
+      throw new DeviceLoginError({ cause: error })
     }
 
     res.cookie(deviceCookie.name, deviceCookie.value, {
       httpOnly: true,
-      secure: true,
+      // secure: true,
       sameSite: 'strict',
-      path: deviceCookie.path,
+      path: pathJoin(sessionPrefix, salePointId, deviceCookie.path),
     })
 
     res.cookie('session', sessionCookie, {
