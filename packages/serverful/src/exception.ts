@@ -1,3 +1,7 @@
+import type { Context } from 'hono'
+import type { StatusCode } from 'hono/utils/http-status'
+import { env } from './config.js'
+
 export type ExceptionCode = string | number
 const exceptionCodes = new Set<ExceptionCode>()
 
@@ -9,6 +13,23 @@ interface ExceptionDetails {
 }
 
 type ValidExceptionDetails = NonEmptyObject<Partial<ExceptionDetails>>
+
+export interface JsonException {
+  code: ExceptionCode
+  message: string
+  cause?: Error | unknown
+}
+
+export function returnHonoError(c: Context, e: Exception, statusCode: StatusCode = 500) {
+  const withCause = env.NODE_ENV === 'development'
+  const payload: JsonException = {
+    code: e.code,
+    message: e.message,
+  }
+  if (withCause && e.cause != null)
+    payload.cause = e.cause
+  return c.json(payload, statusCode)
+}
 
 export class Exception<T extends ValidExceptionDetails | undefined = undefined> extends Error {
   constructor(

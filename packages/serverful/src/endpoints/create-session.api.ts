@@ -1,30 +1,35 @@
 import type { Context } from 'hono'
 import { setCookie } from 'hono/cookie'
-import { HTTPException } from 'hono/http-exception'
 import { env, sessionPrefix } from '../config.js'
 import { getJSessionFromDevice } from '../device.utils.js'
 import { fetchSalePointCredentials } from '../database.utils.js'
 import { firebaseAdminAuth } from '../firebase.js'
+import { Exception, createException, returnHonoError } from '../exception.js'
+
+const MissingUserTokenError = createException('ID Token is required', 'CREATE_SESSION_01')
+const MissingSalePointIdError = createException('SalePointId is required', 'CREATE_SESSION_02')
+const FirebaseSessionError = createException('Error creating firebase session cookie, probably expired', 'CREATE_SESSION_03')
+const DeviceLoginError = createException('Unable to login on device', 'CREATE_SESSION_04')
 
 export async function createSession(c: Context) {
   try {
     const { userToken, salePointId } = await c.req.json()
 
     if (userToken == null) {
-      throw new HTTPException(400, { message: 'ID Token is required' })
+      throw new MissingUserTokenError()
     }
 
     if (salePointId == null) {
-      throw new HTTPException(400, { message: 'SalePointId is required' })
+      throw new MissingSalePointIdError()
     }
 
     let sessionCookie: string
     try {
-      sessionCookie = await firebaseAdminAuth.createSessionCookie(userToken, { expiresIn: env.SESSION_EXPIRY })
+      sessionCookie = await firebaseAdminAuth.createSessionCookie(userToken, { expiresIn: env.SESSION_EXPIRY * 1000 })
     }
     catch (error) {
       console.error('Error creating session cookie:', error)
-      throw new HTTPException(401, { message: 'Error creating firebase session cookie, probably expired' })
+      throw new FirebaseSessionError({ cause: error })
     }
 
     const credentials = await fetchSalePointCredentials(salePointId)
@@ -35,7 +40,7 @@ export async function createSession(c: Context) {
     }
     catch (error) {
       console.error('Unable to login on device:', error)
-      throw new HTTPException(401, { message: 'Unable to login on device' })
+      throw new DeviceLoginError({ cause: error })
     }
 
     setCookie(c, deviceCookie.name, deviceCookie.value, {
@@ -55,10 +60,10 @@ export async function createSession(c: Context) {
     return c.json({ status: 'success' })
   }
   catch (error) {
-    if (error instanceof HTTPException) {
-      throw error
-    }
+    if (error instanceof Exception)
+      return returnHonoError(c, error)
+
     console.error('Unexpected error:', error)
-    throw new HTTPException(500, { message: 'An unexpected error occurred' })
+    return c.json({ message: 'Unexpected error' }, 502)
   }
 }

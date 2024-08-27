@@ -6,7 +6,7 @@ export const env = cleanEnv(nodeEnv, {
   FIREBASE_PROJECT_ID: str(),
   FIREBASE_CLIENT_EMAIL: str(),
   FIREBASE_PRIVATE_KEY: str(),
-  SESSION_EXPIRY: num({ default: 60 * 60 * 24 * 2 * 1000 }), // 2 days
+  SESSION_EXPIRY: num({ default: 60 * 60 * 24 * 2 }), // 2 days
 })
 
 export const sessionPrefix = '/device'
