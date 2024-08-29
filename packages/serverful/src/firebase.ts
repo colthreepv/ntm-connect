@@ -2,8 +2,8 @@ import type { ServiceAccount } from 'firebase-admin/app'
 import { cert, initializeApp } from 'firebase-admin/app'
 import type { DecodedIdToken } from 'firebase-admin/auth'
 import { getAuth } from 'firebase-admin/auth'
-import type { Request } from '@google-cloud/functions-framework'
-import { getFirestore } from 'firebase-admin/firestore'
+import type { Context } from 'hono'
+import { getCookie } from 'hono/cookie'
 import { env } from './config.js'
 import { createException } from './exception.js'
 
@@ -22,15 +22,14 @@ export const firebaseAdminAuth = getAuth(firebaseAdminApp)
 const ErrorVerifyingSessionCookie = createException('Error verifying session cookie', 'FIREBASE_01')
 const NoSessionCookieFound = createException('Unauthorized: No session cookie found', 'FIREBASE_02')
 
-export async function validateSession(req: Request, checkRevoked = false): Promise<DecodedIdToken> {
-  const cookies = req.headers.cookie?.split(';').map(cookie => cookie.trim())
-  const sessionCookie = cookies?.find(cookie => cookie.startsWith('session='))?.split('=')[1]
+export async function validateSession(c: Context, checkRevoked = false): Promise<DecodedIdToken> {
+  const sessionCookie = getCookie(c, 'session')
 
   if (sessionCookie == null)
     throw new NoSessionCookieFound()
 
   try {
-    return firebaseAdminAuth.verifySessionCookie(sessionCookie, checkRevoked)
+    return await firebaseAdminAuth.verifySessionCookie(sessionCookie, checkRevoked)
   }
   catch (error) {
     console.error('Error verifying session cookie:', error)

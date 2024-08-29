@@ -1,9 +1,11 @@
-import { Readable } from 'node:stream'
-import type { HttpFunction } from '@google-cloud/functions-framework'
 import { Agent, Request, fetch } from 'undici'
-import type { SalePointCredentials } from './firebase.js'
-import { fetchSalePointCredentials, validateSession } from './firebase.js'
-import { Exception, createException } from './exception.js'
+import type { Context } from 'hono'
+import { getCookie } from 'hono/cookie'
+import type { StatusCode } from 'hono/utils/http-status'
+import { stream } from 'hono/streaming'
+import { Exception, createException, returnHonoError } from '../exception.js'
+import { validateSession } from '../firebase.js'
+import { fetchSalePointCredentials } from '../database.utils.js'
 
 const forbiddenReqHeaders = ['host', 'connection']
 
@@ -16,81 +18,78 @@ const agent = new Agent({
 const MissingSalePointIdError = createException('Missing salePointId in URL', 'PROXY_01')
 const MissingJSessionIdError = createException('Missing JSESSIONID cookie', 'PROXY_02')
 
-/**
- * A Cloud Function that forwards incoming requests to the corresponding device.
- *
- * The URL of the incoming request is expected to be in the format:
- *   /device/{salePointId}/{remainingPath}
- *
- * The function verifies the session cookie of the incoming request, and then
- * forwards the request to the device with the specified salePointId, using the
- * credentials stored in the "salePointCredentials" collection in Firestore.
- * The response from the device is then proxied back to the client.
- *
- * If the session cookie is invalid, or the salePointId is not found, the
- * function returns a 401 or 404 error respectively. If the function encounters
- * an unexpected error, it returns a 502 error.
- */
-export const deviceRoute: HttpFunction = async (req, res) => {
+export async function proxyRequest(c: Context) {
   try {
-    // Parse the URL to extract salePointId and the rest of the path
-    const urlParts = req.url.split('/').filter(Boolean)
-    const salePointId = urlParts[1]
-    const remainingPath = urlParts.slice(2).join('/')
+    const salePointId = c.req.param('salePointId')
+    const remainingPath = c.req.param('path')
 
     if (!salePointId) {
       throw new MissingSalePointIdError()
     }
 
-    console.log('Request received:', req.url, salePointId, remainingPath)
-
-    await validateSession(req)
+    await validateSession(c)
     const credentials = await fetchSalePointCredentials(salePointId)
     const deviceEndpoint = `https://${credentials.publicIp}/${remainingPath}`
 
     // Filter out forbidden request headers
-    const reqHeaders = Object.fromEntries(
-      Object.entries(req.headers as Record<string, string>)
-        .filter(([k]) => !forbiddenReqHeaders.includes(k.toLowerCase())),
-    )
+    const reqHeaders: Record<string, string> = {}
+    c.req.raw.headers.forEach((value, key) => {
+      if (!forbiddenReqHeaders.includes(key.toLowerCase())) {
+        reqHeaders[key] = value
+      }
+    })
 
     // Handle JSESSIONID cookie
-    if (req.headers.cookie == null)
+    const jsessionidCookie = getCookie(c, 'JSESSIONID')
+    if (!jsessionidCookie)
       throw new MissingJSessionIdError()
-    const cookies = req.headers.cookie.split(';')
-    const jsessionidMatch = cookies.find(cookie => cookie.trim().startsWith('JSESSIONID='))
-    if (jsessionidMatch == null)
-      throw new MissingJSessionIdError()
-
-    const jsessionidCookie = jsessionidMatch.trim()
-    reqHeaders.cookie = jsessionidCookie
+    reqHeaders.cookie = `JSESSIONID=${jsessionidCookie}`
 
     const controller = new AbortController()
-    req.on('close', () => controller.abort())
+    const timeout = setTimeout(() => {
+      controller.abort()
+    }, 30000) // Default to 30 seconds if not set
 
     const request = new Request(deviceEndpoint, {
-      method: req.method,
+      method: c.req.method,
       headers: new Headers(reqHeaders),
-      body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+      body: c.req.method !== 'GET' && c.req.method !== 'HEAD' ? c.req.raw.body : undefined,
       signal: controller.signal,
       duplex: 'half',
     })
 
     const response = await fetch(request, { dispatcher: agent })
-    response.headers.forEach((value, key) => { res.setHeader(key, value) })
-    res.status(response.status)
+    clearTimeout(timeout)
 
-    if (response.body == null)
-      return res.end()
-    Readable.fromWeb(response.body).pipe(res)
+    // Handle potentially conflicting headers
+    const headersToForward = new Headers(response.headers)
+    if (headersToForward.has('transfer-encoding')) {
+      headersToForward.delete('content-length')
+    }
+
+    // Set response headers
+    response.headers.forEach((value, key) => {
+      c.header(key, value)
+    })
+
+    // Set status code
+    c.status(response.status as StatusCode)
+
+    // Stream the response body
+    if (response.body === null) {
+      return c.body(null)
+    }
+
+    return stream(c, async (stream) => {
+      await stream.pipe(response.body as ReadableStream<any>)
+    })
   }
   catch (error) {
     if (error instanceof Exception) {
-      const statusCode = error.code === 'PROXY_01' ? 400 : 401
-      return res.status(statusCode).json({ message: error.message, code: error.code })
+      return returnHonoError(c, error)
     }
 
     console.error('Unexpected error:', error)
-    return res.status(502).json({ message: 'An unexpected error occurred' })
+    return c.json({ message: 'An unexpected error occurred' }, 502)
   }
 }

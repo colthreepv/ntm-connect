@@ -1,12 +1,14 @@
-import type { HttpFunction } from '@google-cloud/functions-framework'
+import type { Context } from 'hono'
+import { setCookie } from 'hono/cookie'
+import { env } from '../config.js'
 
-export const clearSession: HttpFunction = async (req, res) => {
-  res.cookie('session', '', {
+export async function clearSession(c: Context) {
+  setCookie(c, 'session', '', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: env.NODE_ENV === 'production',
     path: '/',
     expires: new Date(0),
   })
-  res.json({ status: 'success' })
+
+  return c.json({ status: 'success' })
 }
