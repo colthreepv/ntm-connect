@@ -32,7 +32,32 @@ export async function validateSession(c: Context, checkRevoked = false): Promise
     return await firebaseAdminAuth.verifySessionCookie(sessionCookie, checkRevoked)
   }
   catch (error) {
-    console.error('Error verifying session cookie:', error)
     throw new ErrorVerifyingSessionCookie({ cause: error })
+  }
+}
+
+const MissingAuthorizationHeader = createException('Missing Authorization header', 'FIREBASE_03')
+const InvalidAuthorizationFormat = createException('Invalid Authorization header format', 'FIREBASE_04')
+const ErrorVerifyingIdToken = createException('Error verifying ID token', 'FIREBASE_05')
+
+export async function validateJwt(c: Context): Promise<DecodedIdToken> {
+  const authHeader = c.req.header('Authorization')
+
+  if (!authHeader) {
+    throw new MissingAuthorizationHeader()
+  }
+
+  const [bearer, token] = authHeader.split(' ')
+
+  if (bearer !== 'Bearer' || !token) {
+    throw new InvalidAuthorizationFormat()
+  }
+
+  try {
+    const decodedToken = await firebaseAdminAuth.verifyIdToken(token)
+    return decodedToken
+  }
+  catch (error) {
+    throw new ErrorVerifyingIdToken({ cause: error })
   }
 }

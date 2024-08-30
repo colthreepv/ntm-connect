@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
-import { validateSession } from '../firebase.js'
-import { Exception, returnHonoError } from '../exception.js'
+import { validateSession } from 'ntm-shared/firebase'
+import { Exception, returnHonoError } from 'ntm-shared/exception'
 
 export async function testSession(c: Context) {
   try {

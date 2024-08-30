@@ -2,4 +2,18 @@
 node_modules
 
 # env file
+.env.*
 .env
+!.env.example.sh
+
+# llm-context
+llm-context.*.txt
+
+# built files
+dist
+
+# db
+database.sqlite3
+
+# seed
+data.json

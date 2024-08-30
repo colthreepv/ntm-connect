@@ -1,0 +1,45 @@
+{
+  "name": "shared",
+  "type": "module",
+  "exports": {
+    "./database": {
+      "types": "./src/database.ts",
+      "default": "./dist/database.js"
+    },
+    "./config": {
+      "types": "./src/config.ts",
+      "default": "./dist/config.js"
+    },
+    "./database.utils": {
+      "types": "./src/database.utils.ts",
+      "default": "./dist/database.utils.js"
+    },
+    "./exception": {
+      "types": "./src/exception.ts",
+      "default": "./dist/exception.js"
+    },
+    "./firebase": {
+      "types": "./src/firebase.ts",
+      "default": "./dist/firebase.js"
+    },
+    "./knexfile": {
+      "types": "./src/knexfile.ts",
+      "default": "./dist/knexfile.js"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "pnpm clean && tsc"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.2.1",
+    "envalid": "^8.0.0",
+    "firebase-admin": "^12.4.0",
+    "hono": "^4.5.9",
+    "knex": "^3.1.0",
+    "objection": "^3.1.4"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  }
+}

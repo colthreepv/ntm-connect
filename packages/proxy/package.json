@@ -1,23 +1,19 @@
 {
-  "name": "serverful",
+  "name": "proxy",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsx watch src/index.ts",
     "clean": "rimraf dist",
-    "build": "pnpm clean && tsc",
-    "knex": "node --import tsx/esm -e \"require('knex/bin/cli')\" knex --knexfile ../shared/src/knexfile",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm clean && tsc"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.1",
     "hono": "^4.5.9",
-    "knex": "^3.1.0",
     "ntm-shared": "workspace:../shared",
     "undici": "^6.19.8"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.11",
     "rimraf": "^6.0.1",
     "tsx": "^4.18.0"
   }

@@ -3,11 +3,12 @@ import type { Context } from 'hono'
 import { getCookie } from 'hono/cookie'
 import type { StatusCode } from 'hono/utils/http-status'
 import { stream } from 'hono/streaming'
-import { Exception, createException, returnHonoError } from '../exception.js'
-import { validateSession } from '../firebase.js'
-import { fetchSalePointCredentials } from '../database.utils.js'
+import { Exception, createException, returnHonoError } from 'ntm-shared/exception'
+import { validateSession } from 'ntm-shared/firebase'
+import { fetchSalePointCredentials } from 'ntm-shared/database.utils'
 
-const forbiddenReqHeaders = ['host', 'connection']
+// if-modified-since saves bandwidth, but creates problems with empty responses
+const forbiddenReqHeaders = ['host', 'connection', 'if-modified-since']
 
 const agent = new Agent({
   connect: {
@@ -61,10 +62,20 @@ export async function proxyRequest(c: Context) {
     const response = await fetch(request, { dispatcher: agent })
     clearTimeout(timeout)
 
-    // Handle potentially conflicting headers
-    const headersToForward = new Headers(response.headers)
-    if (headersToForward.has('transfer-encoding')) {
-      headersToForward.delete('content-length')
+    const contentType = response.headers.get('Content-Type')
+    // Handle Timer.js or Manager.js exception
+    if (contentType != null && contentType.startsWith('application/javascript') && remainingPath.includes('Timer.js') || remainingPath.includes('Manager.js')) {
+      const timerScript = await response.text()
+
+      c.header('Content-Type', 'application/javascript')
+      return c.body(timerScript.replace(/servlet\//g, `/device/${salePointId}/servlet/`))
+    }
+
+    // Read HTML, manipulate the base path and then return it
+    if (contentType != null && contentType.startsWith('text/html')) {
+      const html = await response.text()
+
+      return c.html(html.replace(/<base.*?href=".*?">/g, `<base href="/device/${salePointId}/boss/">`))
     }
 
     // Set response headers

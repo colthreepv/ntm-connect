@@ -1,34 +1,17 @@
 import { useEffect, useState } from 'react'
-import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore'
-import { collection, getDocs, getFirestore } from 'firebase/firestore'
-import { firebaseApp } from './login/firebase' // Adjust this import path as needed
+import { useRouter } from 'next/navigation'
 import { useAuthStore } from './login/auth-store'
 
-interface SalePointData {
-  group: string
-  storeId: string
-  deviceType: string
-  lastPing: string
-  latency: string
-}
-
-interface SalePoint extends SalePointData {
+interface SalePoint {
   id: string
+  company: string
+  storeId: string
+  storeFullName: string
+  deviceType: string
 }
-
-// Firestore Data Converter for SalePointData
-const salePointConverter: FirestoreDataConverter<SalePointData> = {
-  toFirestore: (salePoint: SalePointData) => salePoint,
-  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    const data = snapshot.data()
-    return {
-      group: data.group,
-      storeId: data.storeId,
-      deviceType: data.deviceType,
-      lastPing: data.lastPing,
-      latency: data.latency,
-    } as SalePointData
-  },
+interface SalePointResponse {
+  status: string
+  data: SalePoint[]
 }
 
 export function SkeletonTable() {
@@ -104,39 +87,67 @@ export function SkeletonTable() {
   )
 }
 
+async function createSessionCookie(userToken: string, salePointId: string) {
+  const response = await fetch('/api/session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      userToken,
+      salePointId,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+}
+
+async function fetchSalePoints(userToken: string) {
+  const response = await fetch('/api/sale-points', {
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  const responseBody = (await response.json()) as SalePointResponse
+  return responseBody.data
+}
+
 export default function StoreTable() {
+  const router = useRouter()
   const [salePoints, setSalePoints] = useState<SalePoint[]>([])
   const [loading, setLoading] = useState(true)
   const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
 
   useEffect(() => {
-    const fetchSalePoints = async () => {
-      const db = getFirestore(firebaseApp)
-      const salePointsCollection = collection(db, 'salePoint').withConverter(salePointConverter)
-
+    const fetchData = async () => {
+      setLoading(true)
       try {
-        const querySnapshot = await getDocs(salePointsCollection)
-        const salePointsData = querySnapshot.docs.map(
-          (doc: QueryDocumentSnapshot<SalePointData>): SalePoint => ({
-            id: doc.id,
-            ...doc.data(),
-          })
-        )
-        setSalePoints(salePointsData)
+        const userToken = await getUserToken()
+        const data = await fetchSalePoints(userToken)
+        setSalePoints(data)
       } catch (error) {
+        // TODO: Handle error appropriately
         console.error('Error fetching sale points:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchSalePoints()
-  }, [])
+    fetchData()
+  }, [getUserToken])
 
   const handleRowClick = async (salePoint: SalePoint) => {
-    console.log('Row clicked:', salePoint)
     const userToken = await getUserToken()
-    console.log('User token:', userToken)
+    await createSessionCookie(userToken, salePoint.id)
+    // router.push(`/device/${salePoint.id}/boss`)
   }
 
   if (loading) return <SkeletonTable />
@@ -245,7 +256,7 @@ export default function StoreTable() {
                       onClick={() => handleRowClick(salePoint)}
                     >
                       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
-                        {salePoint.group}
+                        {salePoint.company}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200">
                         {salePoint.storeId}
@@ -254,10 +265,10 @@ export default function StoreTable() {
                         {salePoint.deviceType}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200">
-                        {salePoint.lastPing}
+                        never
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200">
-                        {salePoint.latency}
+                        No data
                       </td>
                     </tr>
                   ))}

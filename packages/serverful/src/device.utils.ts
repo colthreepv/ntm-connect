@@ -1,5 +1,5 @@
 import { Agent, fetch } from 'undici'
-import { createException } from './exception.js'
+import { createException } from 'ntm-shared/exception'
 
 export interface SessionCookie {
   name: string

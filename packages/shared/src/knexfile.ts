@@ -1,4 +1,9 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import type { Knex } from 'knex'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 export const knexConfig: Knex.Config = {
   client: 'better-sqlite3',
@@ -7,7 +12,7 @@ export const knexConfig: Knex.Config = {
   },
   useNullAsDefault: true,
   migrations: {
-    directory: './migrations',
+    directory: join(__dirname, './migrations'),
   },
 }
 
