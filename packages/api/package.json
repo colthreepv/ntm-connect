@@ -1,5 +1,5 @@
 {
-  "name": "serverful",
+  "name": "@ntm-connect/api",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -11,13 +11,10 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.12.1",
-    "hono": "^4.5.9",
-    "knex": "^3.1.0",
-    "ntm-shared": "workspace:../shared",
-    "undici": "^6.19.8"
+    "@ntm-connect/shared": "workspace:../shared",
+    "hono": "^4.5.9"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.11",
     "rimraf": "^6.0.1",
     "tsx": "^4.18.0"
   }

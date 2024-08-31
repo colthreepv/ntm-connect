@@ -21,6 +21,25 @@ importers:
         specifier: ^5
         version: 5.5.4
 
+  packages/api:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.12.1
+        version: 1.12.1
+      '@ntm-connect/shared':
+        specifier: workspace:../shared
+        version: link:../shared
+      hono:
+        specifier: ^4.5.9
+        version: 4.5.9
+    devDependencies:
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.0.1
+      tsx:
+        specifier: ^4.18.0
+        version: 4.18.0
+
   packages/bootstrap:
     dependencies:
       csv-parse:
@@ -32,44 +51,16 @@ importers:
       '@hono/node-server':
         specifier: ^1.12.1
         version: 1.12.1
+      '@ntm-connect/shared':
+        specifier: workspace:../shared
+        version: link:../shared
       hono:
         specifier: ^4.5.9
         version: 4.5.9
-      ntm-shared:
-        specifier: workspace:../shared
-        version: link:../shared
       undici:
         specifier: ^6.19.8
         version: 6.19.8
     devDependencies:
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.0.1
-      tsx:
-        specifier: ^4.18.0
-        version: 4.18.0
-
-  packages/serverful:
-    dependencies:
-      '@hono/node-server':
-        specifier: ^1.12.1
-        version: 1.12.1
-      hono:
-        specifier: ^4.5.9
-        version: 4.5.9
-      knex:
-        specifier: ^3.1.0
-        version: 3.1.0(better-sqlite3@11.2.1)
-      ntm-shared:
-        specifier: workspace:../shared
-        version: link:../shared
-      undici:
-        specifier: ^6.19.8
-        version: 6.19.8
-    devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^7.6.11
-        version: 7.6.11
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -900,9 +891,6 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
-
-  '@types/better-sqlite3@7.6.11':
-    resolution: {integrity: sha512-i8KcD3PgGtGBLl3+mMYA8PdKkButvPyARxA7IQAd6qeslht13qxb1zzO8dRCtE7U3IoJS782zDBAeoKiM695kg==}
 
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
@@ -4600,10 +4588,6 @@ snapshots:
 
   '@tsconfig/node16@1.0.4':
     optional: true
-
-  '@types/better-sqlite3@7.6.11':
-    dependencies:
-      '@types/node': 22.1.0
 
   '@types/body-parser@1.19.5':
     dependencies:

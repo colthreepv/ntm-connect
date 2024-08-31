@@ -3,9 +3,9 @@ import type { Context } from 'hono'
 import { getCookie } from 'hono/cookie'
 import type { StatusCode } from 'hono/utils/http-status'
 import { stream } from 'hono/streaming'
-import { Exception, createException, returnHonoError } from 'ntm-shared/exception'
-import { validateSession } from 'ntm-shared/firebase'
-import { fetchSalePointCredentials } from 'ntm-shared/database.utils'
+import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
+import { validateSession } from '@ntm-connect/shared/firebase'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
 
 // if-modified-since saves bandwidth, but creates problems with empty responses
 const forbiddenReqHeaders = ['host', 'connection', 'if-modified-since']

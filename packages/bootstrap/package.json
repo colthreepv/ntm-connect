@@ -1,11 +1,6 @@
 {
   "name": "bootstrap",
   "keywords": [],
-  "scripts": {
-    "start": "cd src && tsx watch index.ts",
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "dependencies": {
     "csv-parse": "^5.5.6"
   }

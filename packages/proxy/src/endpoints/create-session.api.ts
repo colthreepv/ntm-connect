@@ -1,9 +1,9 @@
 import type { Context } from 'hono'
 import { setCookie } from 'hono/cookie'
-import { fetchSalePointCredentials } from 'ntm-shared/database.utils'
-import { firebaseAdminAuth } from 'ntm-shared/firebase'
-import { Exception, createException, returnHonoError } from 'ntm-shared/exception'
-import { env, sessionPrefix } from 'ntm-shared/config'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
+import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
+import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
+import { env, sessionPrefix } from '@ntm-connect/shared/config'
 import { getJSessionFromDevice } from '../device.utils.js'
 
 const MissingUserTokenError = createException('ID Token is required', 'CREATE_SESSION_01')

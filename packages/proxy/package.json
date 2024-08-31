@@ -1,5 +1,5 @@
 {
-  "name": "proxy",
+  "name": "@ntm-connect/proxy",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.12.1",
+    "@ntm-connect/shared": "workspace:../shared",
     "hono": "^4.5.9",
-    "ntm-shared": "workspace:../shared",
     "undici": "^6.19.8"
   },
   "devDependencies": {

@@ -2,18 +2,11 @@
 import { exit } from 'node:process'
 import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
-import { knexInstance } from 'ntm-shared/database'
-import { createSession } from './endpoints/create-session.api.js'
-import { clearSession } from './endpoints/clear-session.api.js'
-import { testSession } from './endpoints/test-session.api.js'
+import { knexInstance } from '@ntm-connect/shared/database'
 import { getSalePoints } from './endpoints/sale-point.api.js'
 
 const app = new Hono()
 
-app.get('/', c => c.json('Hello Hono!'))
-app.get('/api/session', testSession)
-app.post('/api/session', createSession)
-app.delete('/api/session', clearSession)
 app.get('/api/sale-points', getSalePoints)
 
 const port = 3003

@@ -1,7 +1,7 @@
 import type { Context } from 'hono'
-import { SalePointCredentials } from 'ntm-shared/database'
-import { Exception, returnHonoError } from 'ntm-shared/exception'
-import { validateJwt } from 'ntm-shared/firebase'
+import { SalePointCredentials } from '@ntm-connect/shared/database'
+import { Exception, returnHonoError } from '@ntm-connect/shared/exception'
+import { validateJwt } from '@ntm-connect/shared/firebase'
 
 export async function getSalePoints(c: Context) {
   try {

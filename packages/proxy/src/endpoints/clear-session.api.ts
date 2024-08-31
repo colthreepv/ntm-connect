@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import { setCookie } from 'hono/cookie'
-import { env } from 'ntm-shared/config'
+import { env } from '@ntm-connect/shared/config'
 
 export async function clearSession(c: Context) {
   setCookie(c, 'session', '', {

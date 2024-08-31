@@ -1,5 +1,5 @@
 {
-  "name": "shared",
+  "name": "@ntm-connect/shared",
   "type": "module",
   "exports": {
     "./database": {

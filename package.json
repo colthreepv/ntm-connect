@@ -1,12 +1,14 @@
 {
-  "name": "ntm-devportal",
+  "name": "ntm-connect",
   "type": "module",
   "version": "0.0.0-devonly",
-  "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a",
-  "description": "",
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "pnpm run -r clean",
+    "build": "pnpm run -r build",
+    "build:backend": "pnpm run --filter shared --filter api --filter proxy build",
+    "build:shared": "pnpm run --filter shared build"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.24.1",
