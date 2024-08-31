@@ -5,8 +5,7 @@ import { validateJwt } from '@ntm-connect/shared/firebase'
 
 export async function getSalePoints(c: Context) {
   try {
-    const user = await validateJwt(c)
-    console.log('User:', user)
+    await validateJwt(c)
 
     const salePoints = await SalePointCredentials.query()
       .select('id', 'company', 'storeId', 'storeFullName', 'deviceType', 'publicIp')
