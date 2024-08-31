@@ -3,7 +3,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsx watch src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "clean": "rimraf dist",
     "build": "pnpm clean && tsc",
     "knex": "node --import tsx/esm -e \"require('knex/bin/cli')\" knex --knexfile ../shared/src/knexfile",

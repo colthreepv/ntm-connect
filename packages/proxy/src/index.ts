@@ -16,7 +16,7 @@ app.post('/api/session', createSession)
 app.delete('/api/session', clearSession)
 app.all('/:path{.+}', proxyRequest)
 
-const port = 3003
+const port = 3004
 
 async function main() {
   try {

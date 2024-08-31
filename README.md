@@ -26,6 +26,51 @@ If green-light, the user can click again to open the portal in a new tab, redire
 This requires the developer to have an etc/hosts file similar to this:
 
 ```text
-127.0.0.1 ntm-connect.local
-127.0.0.1 *.ntm-connect.local
+::1 ntm-connect.local
+::1 esi-magliana-0265.ntm-connect.local
+::1 esi-nettunense-8d37.ntm-connect.local
+::1 esi-monterotondo-383d.ntm-connect.local
+::1 esi-velletri-ebdd.ntm-connect.local
+::1 esi-aprilia-3f7a.ntm-connect.local
+::1 esi-romanina-c2dd.ntm-connect.local
+```
+
+### Setting up environment variables
+
+1. Create a `.env.sh` file based on the `.env.example.sh` template.
+2. Source the environment variables:
+
+```bash
+source .env.sh
+```
+
+```bash
+pnpm i
+pnpm dev
+```
+
+expected output:
+
+```shell
+$ pnpm dev
+
+> ntm-connect@0.0.0-devonly dev /home/valerio/projects/valerio/ntm-devportal
+> pnpm run -r dev
+
+Scope: 5 of 6 workspace projects
+packages/api dev$ tsx watch src/index.ts
+│ No migrations to run
+│ Server is running on port 3003
+└─ Running...
+packages/proxy dev$ tsx watch src/index.ts
+│ No migrations to run
+│ Server is running on port 3004
+└─ Running...
+packages/web dev$ next dev
+│   ▲ Next.js 14.2.5
+│   - Local:        http://localhost:3000
+│   - Environments: .env.local
+│  ✓ Starting...
+│  ✓ Ready in 1720ms
+└─ Running...
 ```
