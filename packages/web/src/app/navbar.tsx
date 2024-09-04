@@ -9,7 +9,7 @@ export default function Navbar() {
     }))
   )
   return (
-    <header className="sticky inset-x-0 top-0 z-50 flex w-full flex-wrap border-b bg-white py-1 text-sm sm:flex-nowrap sm:justify-start sm:py-2 dark:border-gray-700 dark:bg-gray-800">
+    <header className="sticky inset-x-0 top-0 z-40 flex w-full flex-wrap border-b bg-white py-1 text-sm sm:flex-nowrap sm:justify-start sm:py-2 dark:border-gray-700 dark:bg-gray-800">
       <nav
         className="mx-auto flex w-full basis-full items-center px-4 sm:px-6 md:px-8"
         aria-label="Global"

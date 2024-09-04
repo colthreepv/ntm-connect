@@ -18,11 +18,14 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar />
-      <main className="container mx-auto">
-        {loading && <SkeletonTable />}
-        {user && <StoreTable />}
-      </main>
+      <div id="app">
+        <Navbar />
+        <main className="container mx-auto">
+          {loading && <SkeletonTable />}
+          {user && <StoreTable />}
+        </main>
+      </div>
+      <div id="modals" />
     </div>
   )
 }

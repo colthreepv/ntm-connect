@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuthStore } from './login/auth-store'
+import Modal from './modal'
+import { useModalStore } from '@/store/modal.store'
+import { env } from '@/config'
 
 interface SalePoint {
   id: string
@@ -88,7 +90,7 @@ export function SkeletonTable() {
 }
 
 async function createSessionCookie(userToken: string, salePointId: string) {
-  const response = await fetch('/api/session', {
+  const response = await fetch(`${env.protocol}://${env.domain}/api/session`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -120,11 +122,78 @@ async function fetchSalePoints(userToken: string) {
   return responseBody.data
 }
 
+function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
+  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
+  const [isLoading, setLoading] = useState(true)
+  const [isReady, setReady] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const doLogin = async () => {
+      if (salePoint == null) return
+      try {
+        const userToken = await getUserToken()
+        await createSessionCookie(userToken, salePoint.id)
+      } catch (error) {
+        console.error(error)
+        if (error instanceof Error) {
+          setError(error.message)
+        } else {
+          setError('Something went wrong, check console for details')
+        }
+      } finally {
+        setLoading(false)
+        setReady(false)
+      }
+    }
+
+    doLogin()
+  }, [salePoint, getUserToken])
+
+  const handleSubmit = () => {
+    if (salePoint == null) return
+    window.open(`${env.protocol}://${salePoint.id}.${env.domain}/boss`, '_blank')
+  }
+
+  if (salePoint == null) return null
+
+  return (
+    <Modal
+      title={`Logging into device: ${salePoint.storeId}`}
+      onSubmit={handleSubmit}
+      submitEnabled={isReady}
+    >
+      <div>
+        {isLoading && (
+          <div className="flex" role="status">
+            <p className="mr-4 align-bottom">Creating session...</p>
+            <div
+              className="inline-block size-6 animate-spin rounded-full border-[3px] border-current border-t-transparent text-blue-600 dark:text-blue-500"
+              role="status"
+              aria-label="loading"
+            >
+              <span className="sr-only">Loading...</span>
+            </div>
+          </div>
+        )}
+        {error && (
+          <>
+            <p>Report this error to the developers</p>
+            <p className="text-red-500">{error}</p>
+          </>
+        )}
+        {isReady && <p>Login successful, click on submit to open it in a new tab</p>}
+      </div>
+    </Modal>
+  )
+}
+
 export default function StoreTable() {
-  const router = useRouter()
+  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
+  const { openModal } = useModalStore()
   const [salePoints, setSalePoints] = useState<SalePoint[]>([])
   const [loading, setLoading] = useState(true)
-  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
+  const [selectedSalePoint, setSelectedSalePoint] = useState<SalePoint | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,15 +214,15 @@ export default function StoreTable() {
   }, [getUserToken])
 
   const handleRowClick = async (salePoint: SalePoint) => {
-    const userToken = await getUserToken()
-    await createSessionCookie(userToken, salePoint.id)
-    // router.push(`/device/${salePoint.id}/boss`)
+    setSelectedSalePoint(salePoint)
+    openModal()
   }
 
   if (loading) return <SkeletonTable />
 
   return (
     <div className="mx-auto max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <SalePointModal salePoint={selectedSalePoint} />
       {/* <!-- Card --> */}
       <div className="flex flex-col">
         <div className="-m-1.5 overflow-x-auto">
@@ -182,9 +251,9 @@ export default function StoreTable() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
