@@ -2,9 +2,10 @@ import type { Context } from 'hono'
 import { setCookie } from 'hono/cookie'
 import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
 import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
+import { env as sharedEnv } from '@ntm-connect/shared/config'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
-import { env, sessionPrefix } from '@ntm-connect/shared/config'
 import { getJSessionFromDevice } from '../device.utils.js'
+import { env } from '../config.js'
 
 const MissingUserTokenError = createException('ID Token is required', 'CREATE_SESSION_01')
 const MissingSalePointIdError = createException('SalePointId is required', 'CREATE_SESSION_02')
@@ -25,7 +26,7 @@ export async function createSession(c: Context) {
 
     let sessionCookie: string
     try {
-      sessionCookie = await firebaseAdminAuth.createSessionCookie(userToken, { expiresIn: env.SESSION_EXPIRY * 1000 })
+      sessionCookie = await firebaseAdminAuth.createSessionCookie(userToken, { expiresIn: sharedEnv.SESSION_EXPIRY * 1000 })
     }
     catch (error) {
       console.error('Error creating session cookie:', error)
@@ -45,16 +46,20 @@ export async function createSession(c: Context) {
 
     setCookie(c, deviceCookie.name, deviceCookie.value, {
       httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      path: `${sessionPrefix}/${salePointId}${deviceCookie.path}`,
+      secure: sharedEnv.NODE_ENV === 'production',
+      sameSite: 'None',
+      path: deviceCookie.path,
+      domain: env.ALLOWED_ORIGIN,
+      maxAge: sharedEnv.SESSION_EXPIRY,
     })
 
     setCookie(c, 'session', sessionCookie, {
-      maxAge: env.SESSION_EXPIRY,
+      maxAge: sharedEnv.SESSION_EXPIRY,
       httpOnly: true,
-      secure: env.NODE_ENV === 'production',
+      sameSite: 'None',
+      secure: sharedEnv.NODE_ENV === 'production',
       path: '/',
+      domain: env.ALLOWED_ORIGIN,
     })
 
     return c.json({ status: 'success' })

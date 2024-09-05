@@ -129,11 +129,17 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Reset state when salePoint changes
+    setLoading(true)
+    setReady(false)
+    setError(null)
+
     const doLogin = async () => {
       if (salePoint == null) return
       try {
         const userToken = await getUserToken()
         await createSessionCookie(userToken, salePoint.id)
+        setReady(true)
       } catch (error) {
         console.error(error)
         if (error instanceof Error) {
@@ -143,7 +149,6 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
         }
       } finally {
         setLoading(false)
-        setReady(false)
       }
     }
 
@@ -159,7 +164,7 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
 
   return (
     <Modal
-      title={`Logging into device: ${salePoint.storeId}`}
+      title={`Automatically logging into ${salePoint.storeId}`}
       onSubmit={handleSubmit}
       submitEnabled={isReady}
     >

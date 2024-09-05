@@ -6,6 +6,7 @@ import { stream } from 'hono/streaming'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateSession } from '@ntm-connect/shared/firebase'
 import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
+import { env } from './config.js'
 
 // if-modified-since saves bandwidth, but creates problems with empty responses
 const forbiddenReqHeaders = ['host', 'connection', 'if-modified-since']
@@ -16,17 +17,30 @@ const agent = new Agent({
   },
 })
 
+const DOMAIN_REGEX = new RegExp(`(.*?)\.${env.ALLOWED_ORIGIN}`)
+
 const MissingSalePointIdError = createException('Missing salePointId in URL', 'PROXY_01')
 const MissingJSessionIdError = createException('Missing JSESSIONID cookie', 'PROXY_02')
+const MissingHostHeader = createException('Missing Host header', 'PROXY_03')
 
 export async function proxyRequest(c: Context) {
   try {
-    const salePointId = c.req.param('salePointId')
+    const hostHeader = c.req.header('host')
+    if (hostHeader == null)
+      throw new MissingHostHeader()
+
+    const match = hostHeader.match(DOMAIN_REGEX)
+    if (!match)
+      throw new MissingSalePointIdError()
+
+    const [, salePointId] = match
     const remainingPath = c.req.param('path')
 
     if (!salePointId) {
       throw new MissingSalePointIdError()
     }
+
+    console.log('proxyRequest', salePointId, remainingPath)
 
     await validateSession(c)
     const credentials = await fetchSalePointCredentials(salePointId)
