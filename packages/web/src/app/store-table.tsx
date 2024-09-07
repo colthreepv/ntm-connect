@@ -125,21 +125,20 @@ async function fetchSalePoints(userToken: string) {
 function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
   const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
   const [isLoading, setLoading] = useState(true)
-  const [isReady, setReady] = useState(false)
+  const [userToken, setUserToken] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Reset state when salePoint changes
     setLoading(true)
-    setReady(false)
+    setUserToken(null)
     setError(null)
 
     const doLogin = async () => {
       if (salePoint == null) return
       try {
         const userToken = await getUserToken()
-        await createSessionCookie(userToken, salePoint.id)
-        setReady(true)
+        setUserToken(userToken)
       } catch (error) {
         console.error(error)
         if (error instanceof Error) {
@@ -157,7 +156,11 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
 
   const handleSubmit = () => {
     if (salePoint == null) return
-    window.open(`${env.protocol}://${salePoint.id}.${env.domain}/boss`, '_blank')
+    if (userToken == null) return
+    window.open(
+      `${env.protocol}://${env.domain}/prepare-route/${salePoint.id}/${userToken}`,
+      '_blank'
+    )
   }
 
   if (salePoint == null) return null
@@ -166,12 +169,12 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
     <Modal
       title={`Automatically logging into ${salePoint.storeId}`}
       onSubmit={handleSubmit}
-      submitEnabled={isReady}
+      submitEnabled={userToken !== null}
     >
       <div>
         {isLoading && (
           <div className="flex" role="status">
-            <p className="mr-4 align-bottom">Creating session...</p>
+            <p className="mr-4 align-bottom">Preparing informations...</p>
             <div
               className="inline-block size-6 animate-spin rounded-full border-[3px] border-current border-t-transparent text-blue-600 dark:text-blue-500"
               role="status"
@@ -187,7 +190,7 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
             <p className="text-red-500">{error}</p>
           </>
         )}
-        {isReady && <p>Login successful, click on submit to open it in a new tab</p>}
+        {userToken && <p>Login successful, click on submit to open it in a new tab</p>}
       </div>
     </Modal>
   )

@@ -5,28 +5,19 @@ import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
 import { env as sharedEnv } from '@ntm-connect/shared/config'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
 import { getJSessionFromDevice } from '../device.utils.js'
-import { env } from '../config.js'
+import { env, proxyDomain } from '../config.js'
 
-const MissingUserTokenError = createException('ID Token is required', 'CREATE_SESSION_01')
-const MissingSalePointIdError = createException('SalePointId is required', 'CREATE_SESSION_02')
-const FirebaseSessionError = createException('Error creating firebase session cookie, probably expired', 'CREATE_SESSION_03')
-const DeviceLoginError = createException('Unable to login on device', 'CREATE_SESSION_04')
+const FirebaseSessionError = createException('Error creating firebase session cookie, probably expired', 'CREATE_SESSION_01')
+const DeviceLoginError = createException('Unable to login on device', 'CREATE_SESSION_02')
 
 export async function createSession(c: Context) {
   try {
-    const { userToken, salePointId } = await c.req.json()
-
-    if (userToken == null) {
-      throw new MissingUserTokenError()
-    }
-
-    if (salePointId == null) {
-      throw new MissingSalePointIdError()
-    }
+    const salePointId = c.req.param('salePointId')
+    const jwt = c.req.param('jwt')
 
     let sessionCookie: string
     try {
-      sessionCookie = await firebaseAdminAuth.createSessionCookie(userToken, { expiresIn: sharedEnv.SESSION_EXPIRY * 1000 })
+      sessionCookie = await firebaseAdminAuth.createSessionCookie(jwt, { expiresIn: sharedEnv.SESSION_EXPIRY * 1000 })
     }
     catch (error) {
       console.error('Error creating session cookie:', error)
@@ -47,22 +38,21 @@ export async function createSession(c: Context) {
     setCookie(c, deviceCookie.name, deviceCookie.value, {
       httpOnly: true,
       secure: sharedEnv.NODE_ENV === 'production',
-      sameSite: 'None',
+      sameSite: 'Lax',
       path: deviceCookie.path,
-      domain: env.ALLOWED_ORIGIN,
-      maxAge: sharedEnv.SESSION_EXPIRY,
+      domain: env.DOMAIN,
     })
 
     setCookie(c, 'session', sessionCookie, {
       maxAge: sharedEnv.SESSION_EXPIRY,
       httpOnly: true,
-      sameSite: 'None',
+      sameSite: 'Lax',
       secure: sharedEnv.NODE_ENV === 'production',
       path: '/',
-      domain: env.ALLOWED_ORIGIN,
+      domain: env.DOMAIN,
     })
 
-    return c.json({ status: 'success' })
+    return c.redirect(`${proxyDomain.protocol}://${salePointId}.${proxyDomain.domain}/boss/`)
   }
   catch (error) {
     if (error instanceof Exception)

@@ -1,1 +1,1 @@
-export ALLOWED_ORIGIN=public-online.domain
+export DOMAIN=public-online.domain
