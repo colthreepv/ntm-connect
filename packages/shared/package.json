@@ -21,6 +21,10 @@
     "./firebase": {
       "types": "./src/firebase.ts",
       "default": "./dist/firebase.js"
+    },
+    "./request": {
+      "types": "./src/request.ts",
+      "default": "./dist/request.js"
     }
   },
   "scripts": {

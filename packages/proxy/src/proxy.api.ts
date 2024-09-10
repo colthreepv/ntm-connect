@@ -6,8 +6,8 @@ import type { StatusCode } from 'hono/utils/http-status'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateSession } from '@ntm-connect/shared/firebase'
 import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
+import { httpsRequest } from '@ntm-connect/shared/request'
 import { browserProtocol, env, proxyDomain } from './config.js'
-import { httpsRequest } from './request.utils.js'
 
 const forbiddenReqHeaders = ['host', 'connection']
 
