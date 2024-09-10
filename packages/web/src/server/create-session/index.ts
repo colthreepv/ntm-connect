@@ -1,10 +1,9 @@
 import type { Context } from 'hono'
 import { setCookie } from 'hono/cookie'
-import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
 import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
-import { env as sharedEnv } from '@ntm-connect/shared/config'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
-import { NODE_ENV, browserProtocol, cookieDomain, proxyDomain } from '@/config'
+import { NODE_ENV, browserProtocol, cookieDomain, proxyDomain, sessionExpiry } from '@/config'
 
 import { getJSessionFromDevice } from '@/server/create-session/device'
 
@@ -18,7 +17,7 @@ export async function createSession(c: Context) {
 
     let sessionCookie: string
     try {
-      sessionCookie = await firebaseAdminAuth.createSessionCookie(jwt, { expiresIn: sharedEnv.SESSION_EXPIRY * 1000 })
+      sessionCookie = await firebaseAdminAuth.createSessionCookie(jwt, { expiresIn: sessionExpiry * 1000 })
     }
     catch (error) {
       console.error('Error creating session cookie:', error)
@@ -47,7 +46,7 @@ export async function createSession(c: Context) {
     setCookie(c, 'session', sessionCookie, {
       domain: cookieDomain,
       httpOnly: true,
-      maxAge: sharedEnv.SESSION_EXPIRY,
+      maxAge: sessionExpiry,
       path: '/',
       sameSite: 'Lax',
       secure: NODE_ENV === 'production',

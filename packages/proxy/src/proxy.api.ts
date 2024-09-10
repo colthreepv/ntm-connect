@@ -5,8 +5,8 @@ import { getCookie } from 'hono/cookie'
 import type { StatusCode } from 'hono/utils/http-status'
 import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateSession } from '@ntm-connect/shared/firebase'
-import { fetchSalePointCredentials } from '@ntm-connect/shared/database.utils'
-import { env, proxyDomain } from './config.js'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
+import { browserProtocol, env, proxyDomain } from './config.js'
 import { httpsRequest } from './request.utils.js'
 
 const forbiddenReqHeaders = ['host', 'connection']
@@ -66,7 +66,7 @@ export async function proxyEndpoint(c: Context) {
     // Replace REFERER header with original domain
     const referer = c.req.header('referer')
     if (referer != null) {
-      reqHeaders.referer = referer.replace(`${proxyDomain.protocol}://${salePointId}.${proxyDomain.domain}`, `https://${credentials.publicIp}`)
+      reqHeaders.referer = referer.replace(`${browserProtocol}://${salePointId}.${proxyDomain}`, `https://${credentials.publicIp}`)
     }
 
     const requestBodyBuffer = Buffer.from(await c.req.arrayBuffer())
@@ -75,7 +75,7 @@ export async function proxyEndpoint(c: Context) {
     if (proxyRes.statusCode === 301 || proxyRes.statusCode === 302) {
       if (proxyRes.headers.location == null)
         throw new MalformedDeviceRequest({ reason: 'Missing Location header on redirect' })
-      const newLocation = proxyRes.headers.location?.replace(`https://${credentials.publicIp}`, `${proxyDomain.protocol}://${salePointId}.${proxyDomain.domain}`)
+      const newLocation = proxyRes.headers.location?.replace(`https://${credentials.publicIp}`, `${browserProtocol}://${salePointId}.${proxyDomain}`)
       return c.redirect(newLocation)
     }
 
@@ -89,7 +89,7 @@ export async function proxyEndpoint(c: Context) {
     const contentType = proxyRes.headers['content-type']
     // Read HTML, manipulate the base path and then return it
     if (contentType != null && contentType.startsWith('text/html')) {
-      return c.html(proxyBody.toString().replace(/<base.*?href=".*?">/g, `<base id="basePath" href="${proxyDomain.protocol}://${salePointId}.${proxyDomain.domain}/boss/">`))
+      return c.html(proxyBody.toString().replace(/<base.*?href=".*?">/g, `<base id="basePath" href="${browserProtocol}://${salePointId}.${proxyDomain}/boss/">`))
     }
 
     return c.body(proxyBody)

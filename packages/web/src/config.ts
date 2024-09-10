@@ -10,3 +10,4 @@ export const browserProtocol = NODE_ENV === 'production' ? 'https' : 'http'
 export const serverDomain = NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_CONNECT_DOMAIN : 'ntm-connect.local:3000'
 export const cookieDomain = NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_CONNECT_DOMAIN : 'ntm-connect.local'
 export const proxyDomain = NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_CONNECT_DOMAIN : 'ntm-connect.local:3004'
+export const sessionExpiry = 60 * 60 * 24 * 2 // 2 days

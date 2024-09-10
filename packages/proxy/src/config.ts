@@ -1,15 +1,10 @@
 import { env as nodeEnv } from 'node:process'
 import { cleanEnv, str } from 'envalid'
-import { env as sharedEnv } from '@ntm-connect/shared/config'
 
 export const env = cleanEnv(nodeEnv, {
+  NODE_ENV: str({ choices: ['production', 'development'], default: 'development' }),
   DOMAIN: str({ devDefault: 'ntm-connect.local:3004' }),
 })
 
-export const proxyDomain = {
-  protocol: sharedEnv.NODE_ENV === 'development' ? 'http' : 'https',
-  domain:
-    sharedEnv.NODE_ENV === 'development'
-      ? 'ntm-connect.local:3004'
-      : env.DOMAIN,
-}
+export const proxyDomain = env.NODE_ENV === 'production' ? env.DOMAIN : 'ntm-connect.local:3004'
+export const browserProtocol = env.NODE_ENV === 'production' ? 'https' : 'http'
