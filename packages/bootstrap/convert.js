@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 const fs = require('node:fs')
 const { parse } = require('csv-parse')
 
 const inputFile = 'input.csv'
-const outputFile = 'output.json'
+const outputFile = 'data.json'
 
 const records = []
 const storeFullNames = []
@@ -14,25 +15,40 @@ function generateStoreId(fullName) {
 }
 
 // Function to determine company
-function determineCompany(companyName) {
+function determineCompany() {
   return 'esi'
 }
 
+const columns = [
+  'storeFullName',
+  'deviceType',
+  'publicIp',
+  'username',
+  'password',
+  'spokesperson',
+  'spPhone',
+  'salePointPhone',
+  'email',
+  'engineer',
+  'engineerPhone',
+]
+
 fs.createReadStream(inputFile)
-  .pipe(parse({ columns: true, skip_empty_lines: true }))
-  .on('data', (row) => {
-    const storeFullName = row['ESI EUROSURGELATI ITALIA S.R.L.'] || row['ESI F.R. S.R.L.'] || row['ESI FLEMING S.R.L.'] || row['ESI GO FROST S.R.L.'] || row['ESI HAPPY GELO S.R.L.'] || row['ESI ICE GIO\' SRL']
-    if (storeFullName) {
-      storeFullNames.push(storeFullName)
+  .pipe(parse({ columns, skip_empty_lines: true }))
+  .on('data', (record) => {
+    if (record.username.trim() === 'USER')
+      return
+    if (record.storeFullName) {
+      storeFullNames.push(record.storeFullName)
       records.push({
-        company: determineCompany(Object.keys(row)[0]),
-        storeId: generateStoreId(storeFullName),
-        storeFullName,
-        deviceType: row.SUPERVISORE,
-        publicIp: row['IP PUBBLICO'],
-        username: row.USER,
-        password: row.PSWD,
-        email: row.Email,
+        company: determineCompany(),
+        storeId: generateStoreId(record.storeFullName),
+        storeFullName: record.storeFullName,
+        deviceType: record.deviceType,
+        publicIp: record.publicIp.replace('https://', '').replace('/boss/', ''),
+        username: record.username,
+        password: record.password,
+        email: record.email,
       })
     }
   })

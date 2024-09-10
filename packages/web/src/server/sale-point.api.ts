@@ -1,14 +1,23 @@
 import type { Context } from 'hono'
-import { SalePointCredentials } from '@ntm-connect/shared/database'
+import { salePointCredentials } from '@ntm-connect/shared/database.schema'
 import { Exception, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateJwt } from '@ntm-connect/shared/firebase'
+import { db } from './database'
 
 export async function getSalePoints(c: Context) {
   try {
     await validateJwt(c)
 
-    const salePoints = await SalePointCredentials.query()
-      .select('id', 'company', 'storeId', 'storeFullName', 'deviceType', 'publicIp')
+    const salePoints = await db
+      .select({
+        id: salePointCredentials.id,
+        company: salePointCredentials.company,
+        storeId: salePointCredentials.storeId,
+        storeFullName: salePointCredentials.storeFullName,
+        deviceType: salePointCredentials.deviceType,
+        publicIp: salePointCredentials.publicIp,
+      })
+      .from(salePointCredentials)
       .limit(100)
 
     return c.json({ status: 'success', data: salePoints })

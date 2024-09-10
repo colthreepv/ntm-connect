@@ -6,12 +6,13 @@
     "moduleResolution": "NodeNext",
     "strict": true,
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "typesVersions": {
     "*": {
       "*": ["./dist/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*.ts"]
 }

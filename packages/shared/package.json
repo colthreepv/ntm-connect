@@ -2,13 +2,17 @@
   "name": "@ntm-connect/shared",
   "type": "module",
   "exports": {
+    "./config": {
+      "types": "./src/config.ts",
+      "default": "./dist/config.js"
+    },
     "./database": {
       "types": "./src/database.ts",
       "default": "./dist/database.js"
     },
-    "./config": {
-      "types": "./src/config.ts",
-      "default": "./dist/config.js"
+    "./database.schema": {
+      "types": "./src/database.schema.ts",
+      "default": "./dist/database.schema.js"
     },
     "./database.utils": {
       "types": "./src/database.utils.ts",
@@ -30,10 +34,15 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "pnpm clean && tsc",
-    "build:watch": "pnpm clean && tsc --watch"
+    "build:watch": "pnpm clean && tsc --watch",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/database.seed.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "better-sqlite3": "^11.2.1",
+    "drizzle-orm": "^0.33.0",
     "envalid": "^8.0.0",
     "firebase-admin": "^12.4.0",
     "hono": "^4.5.9",
@@ -41,6 +50,9 @@
     "objection": "^3.1.4"
   },
   "devDependencies": {
-    "rimraf": "^6.0.1"
+    "@types/better-sqlite3": "^7.6.11",
+    "drizzle-kit": "^0.24.2",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.18.0"
   }
 }

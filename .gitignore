@@ -5,6 +5,7 @@ node_modules
 .env.*
 .env
 !.env.example.sh
+!.env.example
 
 # llm-context
 llm-context.*.txt
@@ -17,3 +18,4 @@ database.sqlite3
 
 # seed
 data.json
+input.csv

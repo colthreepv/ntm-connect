@@ -1,5 +1,5 @@
-import { handle } from '@hono/node-server/vercel'
-import { app } from './index'
+import { handle } from 'hono/vercel'
+import { app } from '@/server'
 
 export const OPTIONS = handle(app)
 export const GET = handle(app)

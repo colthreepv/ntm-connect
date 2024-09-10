@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { NODE_ENV } from '@/config'
 
 interface ModalState {
   isOpen: boolean
@@ -16,6 +17,6 @@ export const useModalStore = create<ModalState>()(
       openModal: (onSubmit?: () => void) => set({ isOpen: true, onSubmit }),
       closeModal: () => set({ isOpen: false, onSubmit: null }),
     }),
-    { name: 'modal-store', enabled: process.env.NODE_ENV === 'development' },
+    { name: 'modal-store', enabled: NODE_ENV === 'development' },
   ),
 )

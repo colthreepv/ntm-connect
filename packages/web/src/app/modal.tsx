@@ -3,7 +3,7 @@ import React from 'react'
 import ReactModal from 'react-modal'
 import { useModalStore } from '@/store/modal.store'
 
-// ReactModal.setAppElement('#modals')
+ReactModal.setAppElement('#app')
 
 type ModalProps = PropsWithChildren<{
   title?: string

@@ -1,14 +1,16 @@
+import { eq } from 'drizzle-orm'
+import { db } from './database.js'
+import { salePointCredentials } from './database.schema.js'
 import { createException } from './exception.js'
-import { SalePointCredentials } from './database.js'
 
 const SalePointCredentialsNotFound = createException('SalePoint credentials not found', 'DATABASE_UTILS_01')
 
-export async function fetchSalePointCredentials(id: string): Promise<SalePointCredentials> {
-  const credentials = await SalePointCredentials.query().findById(id)
+export async function fetchSalePointCredentials(id: string) {
+  const credentials = await db.select().from(salePointCredentials).where(eq(salePointCredentials.id, id))
 
-  if (!credentials) {
+  if (credentials.length === 0) {
     throw new SalePointCredentialsNotFound({ reason: `${id} not found` })
   }
 
-  return credentials
+  return credentials[0]
 }

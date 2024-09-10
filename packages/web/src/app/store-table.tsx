@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from './login/auth-store'
 import Modal from './modal'
 import { useModalStore } from '@/store/modal.store'
-import { env } from '@/config'
+import { browserProtocol, serverDomain } from '@/config'
 
 interface SalePoint {
   id: string
@@ -141,7 +141,7 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
     if (salePoint == null) return
     if (userToken == null) return
     window.open(
-      `${env.protocol}://${env.domain}/prepare-route/${salePoint.id}/${userToken}`,
+      `${browserProtocol}://${serverDomain}/api/prepare-route/${salePoint.id}/${userToken}`,
       '_blank'
     )
   }

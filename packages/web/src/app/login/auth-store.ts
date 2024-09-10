@@ -2,6 +2,7 @@ import { type User, signOut as firebaseSignOut, onAuthStateChanged, signInWithEm
 import type { FirebaseError } from 'firebase/app'
 import { firebaseAuth } from './firebase'
 import { createAuthStore } from '@/store/utils.zustand'
+import { NODE_ENV } from '@/config'
 
 interface AuthState {
   user: User | null
@@ -48,7 +49,7 @@ export const useAuthStore = createAuthStore<AuthStore>(
       return await user.getIdToken()
     },
   }),
-  { name: 'auth-store', enabled: process.env.NODE_ENV === 'development' },
+  { name: 'auth-store', enabled: NODE_ENV === 'development' },
 )
 
 // Initialize the listener for auth state changes
