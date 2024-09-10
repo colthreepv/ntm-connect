@@ -35,6 +35,14 @@ This requires the developer to have an etc/hosts file similar to this:
 127.0.0.1 esi-romanina-c2dd.ntm-connect.local
 ```
 
+### Locally test proxying
+
+Use something like this
+
+```bash
+curl -vkL -H "Cookie: JSESSIONID=node01sdwb4l77sv941pqgn2qrat6s6818.node0;" https://94.138.189.89/boss/
+```
+
 ### Setting up environment variables
 
 1. Create a `.env.sh` file based on the `.env.example.sh` template.

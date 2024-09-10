@@ -8,6 +8,7 @@
     "clean": "pnpm run -r clean",
     "dev": "pnpm run -r dev",
     "build": "pnpm run -r build",
+    "build:web": "pnpm run --filter web build",
     "build:backend": "pnpm run --filter shared --filter api --filter proxy build",
     "build:shared": "pnpm run --filter shared build"
   },

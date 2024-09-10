@@ -8,7 +8,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hono/node-server": "^1.12.1",
+    "@ntm-connect/shared": "link:../shared",
     "firebase": "^10.12.5",
+    "hono": "^4.5.9",
     "next": "14.2.5",
     "preline": "^2.4.1",
     "react": "^18",

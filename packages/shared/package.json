@@ -29,7 +29,8 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "pnpm clean && tsc"
+    "build": "pnpm clean && tsc",
+    "build:watch": "pnpm clean && tsc --watch"
   },
   "dependencies": {
     "better-sqlite3": "^11.2.1",

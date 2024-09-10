@@ -89,23 +89,6 @@ export function SkeletonTable() {
   )
 }
 
-async function createSessionCookie(userToken: string, salePointId: string) {
-  const response = await fetch(`${env.protocol}://${env.domain}/api/session`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      userToken,
-      salePointId,
-    }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
-}
-
 async function fetchSalePoints(userToken: string) {
   const response = await fetch('/api/sale-points', {
     headers: {
