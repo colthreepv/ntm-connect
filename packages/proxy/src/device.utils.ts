@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer'
 import type { RequestOptions } from 'node:https'
 import { createException } from '@ntm-connect/shared/exception'
-import { httpsRequest } from './request.utils.js'
+import { httpsRequest } from '@ntm-connect/shared/request'
 
 export interface SessionCookie {
   name: string

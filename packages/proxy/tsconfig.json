@@ -1,12 +1,8 @@
 {
+  "extends": "@total-typescript/tsconfig/tsc/no-dom/app",
   "compilerOptions": {
-    "target": "ES2022",
-    "rootDir": "src",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "outDir": "dist",
-    "esModuleInterop": true
+    "noUncheckedIndexedAccess": false, // yes, it's formally correct, but so strict, I would litter my code with hashbangs
+    "outDir": "dist"
   },
-  "include": ["src/**/*"]
+  "include": ["**/*.ts"]
 }

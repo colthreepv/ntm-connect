@@ -11,7 +11,6 @@
     "@ntm-connect/shared": "workspace:../shared",
     "better-sqlite3": "^11.2.1",
     "drizzle-orm": "^0.33.0",
-    "envalid": "^8.0.0",
     "firebase": "^10.12.5",
     "hono": "^4.5.9",
     "next": "14.2.5",

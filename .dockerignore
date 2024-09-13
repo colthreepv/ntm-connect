@@ -1,0 +1,7 @@
+.git
+.next
+.env.sh
+dist
+build
+bootstrap
+node_modules

@@ -7,10 +7,12 @@ import { getCookie } from 'hono/cookie'
 import { env } from './config.js'
 import { createException } from './exception.js'
 
+const parsedPrivateKey = env.NODE_ENV === 'production' ? env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : env.FIREBASE_PRIVATE_KEY
+
 const serviceAccount: ServiceAccount = {
   projectId: env.FIREBASE_PROJECT_ID,
   clientEmail: env.FIREBASE_CLIENT_EMAIL,
-  privateKey: env.FIREBASE_PRIVATE_KEY,
+  privateKey: parsedPrivateKey,
 }
 
 const firebaseAdminApp = initializeApp({

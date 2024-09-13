@@ -82,3 +82,9 @@ packages/web dev$ next dev
 │  ✓ Ready in 1720ms
 └─ Running...
 ```
+
+## Docker build
+
+```shell
+docker build -f docker/Dockerfile.proxy -t ntm-connect/proxy:latest .
+```
