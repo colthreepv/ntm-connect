@@ -1,0 +1,26 @@
+stages:
+  - build
+
+proxy 📦:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - docker info
+  script:
+    - docker build -f docker/Dockerfile.proxy -t $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/proxy:latest .
+    - docker push $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE/proxy:latest
+
+web 📦:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - docker info
+  script:
+    - docker build -f docker/Dockerfile.web -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/web:latest .
+    - docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE/web:latest
