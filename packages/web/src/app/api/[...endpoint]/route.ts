@@ -1,3 +1,4 @@
+'use client'
 import { handle } from 'hono/vercel'
 import { app } from '@/server'
 

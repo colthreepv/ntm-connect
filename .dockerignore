@@ -1,7 +1,13 @@
 .git
+.env*
+.vscode
+
 .next
-.env.sh
 dist
 build
+packages/web/.next
+
 bootstrap
 node_modules
+llm-context*
+database.sqlite3
