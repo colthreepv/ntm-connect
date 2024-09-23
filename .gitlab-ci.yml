@@ -14,7 +14,7 @@ proxy 📦:
     - docker push $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE/proxy:latest
 
-web 📦:
+web:
   stage: build
   image: docker:24.0.5
   services:
@@ -22,6 +22,7 @@ web 📦:
   before_script:
     - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$env_production" > packages/web/.env.production
   script:
     - docker build -f docker/Dockerfile.web -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/web:latest .
     - docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA
