@@ -10,7 +10,13 @@ proxy 📦:
     - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build -f docker/Dockerfile.proxy -t $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/proxy:latest .
+    - |
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        docker build -f docker/Dockerfile.proxy -t $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/proxy:latest -t $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_TAG .
+        docker push $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_TAG
+      else
+        docker build -f docker/Dockerfile.proxy -t $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/proxy:latest .
+      fi
     - docker push $CI_REGISTRY_IMAGE/proxy:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE/proxy:latest
 
@@ -24,6 +30,12 @@ web 📦:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cp $env_production packages/web/.env.production
   script:
-    - docker build -f docker/Dockerfile.web -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/web:latest .
+    - |
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        docker build -f docker/Dockerfile.web -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/web:latest -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG .
+        docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_TAG
+      else
+        docker build -f docker/Dockerfile.web -t $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/web:latest .
+      fi
     - docker push $CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE/web:latest

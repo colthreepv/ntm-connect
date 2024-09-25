@@ -35,6 +35,8 @@ This requires the developer to have an etc/hosts file similar to this:
 127.0.0.1 esi-romanina-c2dd.ntm-connect.local
 ```
 
+Open: http://ntm-connect.local:3000/
+
 ### Locally test proxying
 
 Use something like this
@@ -92,3 +94,6 @@ docker build -f docker/Dockerfile.proxy -t ntm-connect/proxy:latest .
 ```shell
 docker build -f docker/Dockerfile.web -t ntm-connect/web:latest .
 ```
+
+## Seed database
+cd packages/shared

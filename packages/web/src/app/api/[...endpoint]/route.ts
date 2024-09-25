@@ -1,10 +1,16 @@
-'use client'
 import { handle } from 'hono/vercel'
-import { app } from '@/server'
 
-export const OPTIONS = handle(app)
-export const GET = handle(app)
-export const POST = handle(app)
-export const PUT = handle(app)
-export const PATCH = handle(app)
-export const DELETE = handle(app)
+function createHandler() {
+  return async (req: Request, context: any) => {
+    const { app } = await import('@/server')
+    const honoHandler = handle(app)
+    return honoHandler(req, context)
+  }
+}
+
+export const OPTIONS = createHandler()
+export const GET = createHandler()
+export const POST = createHandler()
+export const PUT = createHandler()
+export const PATCH = createHandler()
+export const DELETE = createHandler()

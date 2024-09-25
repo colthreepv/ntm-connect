@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const projectRoot = resolve(__dirname, '../../../')
-const sqlite = new Database(resolve(projectRoot, 'database.sqlite3'))
+const sqlite = new Database(resolve(projectRoot, 'sqlite', 'database.sqlite3'))
 const db: BetterSQLite3Database = drizzle(sqlite)
 
 export { db }
