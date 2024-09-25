@@ -92,7 +92,7 @@ export function SkeletonTable() {
 async function fetchSalePoints(userToken: string) {
   const response = await fetch('/api/sale-points', {
     headers: {
-      Authorization: `Bearer ${userToken}`,
+      'Authorization': `Bearer ${userToken}`,
       'Content-Type': 'application/json',
     },
   })
@@ -106,7 +106,7 @@ async function fetchSalePoints(userToken: string) {
 }
 
 function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
-  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
+  const { getUserToken } = useAuthStore(state => ({ getUserToken: state.userToken }))
   const [isLoading, setLoading] = useState(true)
   const [userToken, setUserToken] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -118,18 +118,22 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
     setError(null)
 
     const doLogin = async () => {
-      if (salePoint == null) return
+      if (salePoint == null)
+        return
       try {
         const userToken = await getUserToken()
         setUserToken(userToken)
-      } catch (error) {
+      }
+      catch (error) {
         console.error(error)
         if (error instanceof Error) {
           setError(error.message)
-        } else {
+        }
+        else {
           setError('Something went wrong, check console for details')
         }
-      } finally {
+      }
+      finally {
         setLoading(false)
       }
     }
@@ -138,15 +142,18 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
   }, [salePoint, getUserToken])
 
   const handleSubmit = () => {
-    if (salePoint == null) return
-    if (userToken == null) return
+    if (salePoint == null)
+      return
+    if (userToken == null)
+      return
     window.open(
-      `${browserProtocol}://${serverDomain}/api/prepare-route/${salePoint.id}/${userToken}`,
-      '_blank'
+      `${browserProtocol}://${serverDomain()}/api/prepare-route/${salePoint.id}/${userToken}`,
+      '_blank',
     )
   }
 
-  if (salePoint == null) return null
+  if (salePoint == null)
+    return null
 
   return (
     <Modal
@@ -180,7 +187,7 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
 }
 
 export default function StoreTable() {
-  const { getUserToken } = useAuthStore((state) => ({ getUserToken: state.userToken }))
+  const { getUserToken } = useAuthStore(state => ({ getUserToken: state.userToken }))
   const { openModal } = useModalStore()
   const [salePoints, setSalePoints] = useState<SalePoint[]>([])
   const [loading, setLoading] = useState(true)
@@ -193,10 +200,12 @@ export default function StoreTable() {
         const userToken = await getUserToken()
         const data = await fetchSalePoints(userToken)
         setSalePoints(data)
-      } catch (error) {
+      }
+      catch (error) {
         // TODO: Handle error appropriately
         console.error('Error fetching sale points:', error)
-      } finally {
+      }
+      finally {
         setLoading(false)
       }
     }
@@ -209,7 +218,8 @@ export default function StoreTable() {
     openModal()
   }
 
-  if (loading) return <SkeletonTable />
+  if (loading)
+    return <SkeletonTable />
 
   return (
     <div className="mx-auto max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
@@ -261,7 +271,9 @@ export default function StoreTable() {
 
                 <div className="flex items-center justify-end sm:col-span-2 md:grow">
                   <span className="text-sm text-gray-600 dark:text-neutral-400">
-                    Total results: <span id="total-results">{salePoints.length}</span>
+                    Total results:
+                    {' '}
+                    <span id="total-results">{salePoints.length}</span>
                   </span>
                 </div>
               </div>
@@ -309,7 +321,7 @@ export default function StoreTable() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                  {salePoints.map((salePoint) => (
+                  {salePoints.map(salePoint => (
                     <tr
                       key={salePoint.storeId}
                       className="cursor-pointer bg-white hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-800"

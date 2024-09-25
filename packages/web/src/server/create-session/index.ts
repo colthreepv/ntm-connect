@@ -36,7 +36,7 @@ export async function createSession(c: Context) {
     }
 
     setCookie(c, deviceCookie.name, deviceCookie.value, {
-      domain: cookieDomain,
+      domain: cookieDomain(),
       httpOnly: true,
       path: deviceCookie.path,
       sameSite: 'Lax',
@@ -44,7 +44,7 @@ export async function createSession(c: Context) {
     })
 
     setCookie(c, 'session', sessionCookie, {
-      domain: cookieDomain,
+      domain: cookieDomain(),
       httpOnly: true,
       maxAge: sessionExpiry,
       path: '/',
@@ -52,7 +52,7 @@ export async function createSession(c: Context) {
       secure: NODE_ENV === 'production',
     })
 
-    return c.redirect(`${browserProtocol}://${salePointId}.${proxyDomain}/boss/`)
+    return c.redirect(`${browserProtocol}://${salePointId}.${proxyDomain()}/boss/`)
   }
   catch (error) {
     if (error instanceof Exception)
