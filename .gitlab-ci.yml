@@ -3,6 +3,8 @@ stages:
 
 proxy 📦:
   stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
   image: docker:24.0.5
   services:
     - docker:24.0.5-dind
@@ -22,6 +24,8 @@ proxy 📦:
 
 web 📦:
   stage: build
+  rules:
+    - if: $CI_COMMIT_TAG
   image: docker:24.0.5
   services:
     - docker:24.0.5-dind
