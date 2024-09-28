@@ -1,12 +1,18 @@
 /* eslint-disable no-console */
 import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
+import { logger } from 'hono/logger'
 import { env } from './config.js'
 import { proxyEndpoint } from './proxy.api.js'
 
 const port = 3004
 const app = new Hono()
 
+if (env.REQUEST_LOG === true) {
+  app.use('*', logger())
+}
+
+app.all('/', proxyEndpoint)
 app.all('/:path{.+}', proxyEndpoint)
 
 async function main() {
