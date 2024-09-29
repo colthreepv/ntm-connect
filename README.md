@@ -89,10 +89,8 @@ packages/web dev$ next dev
 
 ```shell
 docker build -f docker/Dockerfile.proxy -t ntm-connect/proxy:latest .
-```
-
-```shell
 docker build -f docker/Dockerfile.web -t ntm-connect/web:latest .
+docker build -f docker/Dockerfile.taskrunner -t ntm-connect/taskrunner:latest .
 ```
 
 ## Seed database

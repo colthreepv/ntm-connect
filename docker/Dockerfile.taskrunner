@@ -1,0 +1,31 @@
+# Use Node.js 22 as the base image
+FROM node:22
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Enable Corepack to manage package managers like pnpm
+RUN corepack enable \
+  && corepack prepare pnpm@latest --activate
+
+# Copy over the root configuration files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy over package.json files for 'shared' and 'taskrunner' packages
+COPY packages/shared/package.json packages/shared/
+COPY packages/taskrunner/package.json packages/taskrunner/
+
+# Install dependencies using pnpm
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the 'shared' and 'taskrunner' packages
+RUN pnpm run --filter shared --filter taskrunner build
+
+# Set environment variables
+ENV NODE_ENV=production
+
+# Define the command to run your app
+CMD ["node", "packages/taskrunner/dist/index.js"]
