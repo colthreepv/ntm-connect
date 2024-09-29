@@ -15,6 +15,15 @@ export const salePointCredentials = sqliteTable('sale_point_credentials', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 })
 
+export const pingStats = sqliteTable('ping_stats', {
+  salePointId: text('sale_point_id').notNull().references(() => salePointCredentials.id),
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  latency: integer('latency'), // in milliseconds
+  isResponsive: integer('is_responsive', { mode: 'boolean' }).notNull(),
+  ipAddress: text('ip_address'),
+  errorMessage: text('error_message'),
+})
+
 export const seedTracker = sqliteTable('seed_tracker', {
   id: text('id').primaryKey(),
   runAt: integer('run_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),

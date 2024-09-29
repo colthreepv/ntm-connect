@@ -1,0 +1,22 @@
+{
+  "name": "@ntm-connect/taskrunner",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "echo 'just call pnpm exec tsx src/job.ts' && exit 1",
+    "clean": "rimraf dist",
+    "build": "pnpm clean && tsc"
+  },
+  "dependencies": {
+    "@ntm-connect/shared": "workspace:../shared",
+    "bree": "^9.2.4",
+    "consola": "^3.2.3",
+    "envalid": "^8.0.0",
+    "p-queue": "^8.0.1"
+  },
+  "devDependencies": {
+    "@total-typescript/tsconfig": "^1.0.4",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.18.0"
+  }
+}
