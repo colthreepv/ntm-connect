@@ -10,6 +10,14 @@ interface SalePoint {
   storeId: string
   storeFullName: string
   deviceType: string
+  avgLatency: number
+  isAlive: 0 | 1
+  lastSeen: string
+}
+interface BetterSalePoint extends Omit<SalePoint, 'avgLatency' | 'isAlive' | 'lastSeen'> {
+  isAlive: boolean
+  avgLatency: string
+  lastSeen: Date | null
 }
 interface SalePointResponse {
   status: string
@@ -102,10 +110,16 @@ async function fetchSalePoints(userToken: string) {
   }
 
   const responseBody = (await response.json()) as SalePointResponse
-  return responseBody.data
+  const betterData = responseBody.data.map<BetterSalePoint>(salePoint => ({
+    ...salePoint,
+    isAlive: salePoint.isAlive === 1,
+    avgLatency: salePoint.avgLatency.toFixed(0),
+    lastSeen: salePoint.lastSeen == null ? null : new Date(salePoint.lastSeen),
+  }))
+  return betterData
 }
 
-function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
+function SalePointModal({ salePoint }: { salePoint: BetterSalePoint | null }) {
   const { getUserToken } = useAuthStore(state => ({ getUserToken: state.userToken }))
   const [isLoading, setLoading] = useState(true)
   const [userToken, setUserToken] = useState<string | null>(null)
@@ -189,9 +203,9 @@ function SalePointModal({ salePoint }: { salePoint: SalePoint | null }) {
 export default function StoreTable() {
   const { getUserToken } = useAuthStore(state => ({ getUserToken: state.userToken }))
   const { openModal } = useModalStore()
-  const [salePoints, setSalePoints] = useState<SalePoint[]>([])
+  const [salePoints, setSalePoints] = useState<BetterSalePoint[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedSalePoint, setSelectedSalePoint] = useState<SalePoint | null>(null)
+  const [selectedSalePoint, setSelectedSalePoint] = useState<BetterSalePoint | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -213,7 +227,7 @@ export default function StoreTable() {
     fetchData()
   }, [getUserToken])
 
-  const handleRowClick = async (salePoint: SalePoint) => {
+  const handleRowClick = async (salePoint: BetterSalePoint) => {
     setSelectedSalePoint(salePoint)
     openModal()
   }
@@ -337,10 +351,10 @@ export default function StoreTable() {
                         {salePoint.deviceType}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200">
-                        never
+                        {salePoint.lastSeen == null ? 'Never' : salePoint.lastSeen.toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200">
-                        No data
+                        {salePoint.isAlive ? `${salePoint.avgLatency}ms` : '❌'}
                       </td>
                     </tr>
                   ))}
