@@ -1,7 +1,7 @@
-import { eq, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
+import { createException } from '../exception.js'
 import { db } from './database.js'
 import { salePointCredentials } from './database.schema.js'
-import { createException } from './exception.js'
 
 const SalePointCredentialsNotFound = createException('SalePoint credentials not found', 'DATABASE_UTILS_01')
 
