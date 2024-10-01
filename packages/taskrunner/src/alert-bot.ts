@@ -1,10 +1,11 @@
 import process from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { Markup, Telegraf } from 'telegraf'
 import consola from 'consola'
 import { message } from 'telegraf/filters'
 import { db } from '@ntm-connect/shared/database'
 import { subscribedUsers } from '@ntm-connect/shared/database.schema'
-import { eq, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { env } from './config.js'
 
 const bot = new Telegraf(env.TELEGRAM_BOT_KEY)
@@ -23,7 +24,7 @@ export async function addSubscriber(userId: number, username: string | undefined
 
 export async function isUserSubscribed(userId: number): Promise<isUserSubscribedResponse> {
   const result = await db
-    .select({ userId: subscribedUsers.userId, subscribedAt: sql<string>`${subscribedUsers.subscribedAt}` })
+    .select({ userId: subscribedUsers.userId, subscribedAt: subscribedUsers.subscribedAt })
     .from(subscribedUsers)
     .where(eq(subscribedUsers.userId, userId))
     .limit(1)
@@ -118,8 +119,17 @@ bot.on(message('text'), (ctx) => {
   sendMainMenu(ctx)
 })
 
-bot.launch()
-consola.info('Telegram bot started')
+function startBot() {
+  bot.launch()
+  consola.info('Telegram bot started')
 
-process.once('SIGINT', () => bot.stop('SIGINT'))
-process.once('SIGTERM', () => bot.stop('SIGTERM'))
+  process.once('SIGINT', () => bot.stop('SIGINT'))
+  process.once('SIGTERM', () => bot.stop('SIGTERM'))
+}
+
+// Start if this file is called directly
+const modulePath = fileURLToPath(import.meta.url)
+if (process.argv[1] === modulePath)
+  startBot()
+
+export { bot, startBot }
