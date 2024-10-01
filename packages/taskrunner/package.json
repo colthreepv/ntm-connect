@@ -11,8 +11,10 @@
     "@ntm-connect/shared": "workspace:../shared",
     "bree": "^9.2.4",
     "consola": "^3.2.3",
+    "drizzle-orm": "^0.33.0",
     "envalid": "^8.0.0",
-    "p-queue": "^8.0.1"
+    "p-queue": "^8.0.1",
+    "telegraf": "^4.16.3"
   },
   "devDependencies": {
     "@total-typescript/tsconfig": "^1.0.4",

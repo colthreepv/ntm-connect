@@ -28,3 +28,9 @@ export const seedTracker = sqliteTable('seed_tracker', {
   id: text('id').primaryKey(),
   runAt: integer('run_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 })
+
+export const subscribedUsers = sqliteTable('subscribed_users', {
+  userId: integer('user_id').notNull().unique(),
+  username: text('username'),
+  subscribedAt: integer('subscribed_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+})
