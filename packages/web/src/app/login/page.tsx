@@ -31,7 +31,7 @@ export default function LoginPage() {
   }, [user, router])
 
   return (
-    <div className="mx-auto max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <div className="mx-auto max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14" id="app">
       <div className="mx-auto mt-7 max-w-md rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
         <div className="p-4 sm:p-7">
           <div className="text-center">
