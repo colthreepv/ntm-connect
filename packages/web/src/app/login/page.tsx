@@ -11,12 +11,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { user, loading, loginError, signIn } = useAuthStore(
-    useShallow((state) => ({
+    useShallow(state => ({
       user: state.user,
       loading: state.loading,
       loginError: state.error,
       signIn: state.signIn,
-    }))
+    })),
   )
 
   const handleLogin = async (e: FormEvent) => {
@@ -55,7 +55,7 @@ export default function LoginPage() {
                       className="block w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                     />
                   </div>
                 </div>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                       className="block w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                       required
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={e => setPassword(e.target.value)}
                     />
                   </div>
                 </div>

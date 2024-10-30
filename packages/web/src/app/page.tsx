@@ -8,7 +8,7 @@ import StoreTable, { SkeletonTable } from './store-table'
 
 export default function Home() {
   const router = useRouter()
-  const { user, loading } = useAuthStore((state) => ({ user: state.user, loading: state.loading }))
+  const { user, loading } = useAuthStore(state => ({ user: state.user, loading: state.loading }))
 
   useEffect(() => {
     if (!loading && !user) {

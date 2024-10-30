@@ -1,19 +1,27 @@
-import type { Context } from 'hono'
-import { setCookie } from 'hono/cookie'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { Exception, createException } from '@ntm-connect/shared/exception'
 import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
 import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
-import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+import { getJSessionFromDevice } from './device'
 import { NODE_ENV, browserProtocol, cookieDomain, proxyDomain, sessionExpiry } from '@/config'
+import { returnError } from '@/app/api/exception'
 
-import { getJSessionFromDevice } from '@/server/create-session/device'
+interface SessionCookie {
+  name: string
+  value: string
+  path: string
+}
 
 const FirebaseSessionError = createException('Error creating firebase session cookie, probably expired', 'CREATE_SESSION_01')
 const DeviceLoginError = createException('Unable to login on device', 'CREATE_SESSION_02')
 
-export async function createSession(c: Context) {
+export async function GET(_: NextRequest, { params }: { params: Promise<{ salePointId: string, jwt: string }> }) {
   try {
-    const salePointId = c.req.param('salePointId')
-    const jwt = c.req.param('jwt')
+    const { salePointId, jwt } = await params
+    const cookieStore = await cookies()
 
     let sessionCookie: string
     try {
@@ -26,7 +34,7 @@ export async function createSession(c: Context) {
 
     const credentials = await fetchSalePointCredentials(salePointId)
 
-    let deviceCookie: { name: string, value: string, path: string }
+    let deviceCookie: SessionCookie
     try {
       deviceCookie = await getJSessionFromDevice(credentials.publicIp, credentials.username, credentials.password)
     }
@@ -35,30 +43,32 @@ export async function createSession(c: Context) {
       throw new DeviceLoginError({ cause: error })
     }
 
-    setCookie(c, deviceCookie.name, deviceCookie.value, {
+    // Set cookies using Next.js cookies API
+    cookieStore.set(deviceCookie.name, deviceCookie.value, {
       domain: cookieDomain(),
       httpOnly: true,
       path: deviceCookie.path,
-      sameSite: 'Lax',
+      sameSite: 'lax',
       secure: NODE_ENV === 'production',
     })
 
-    setCookie(c, 'session', sessionCookie, {
+    cookieStore.set('session', sessionCookie, {
       domain: cookieDomain(),
       httpOnly: true,
       maxAge: sessionExpiry,
       path: '/',
-      sameSite: 'Lax',
+      sameSite: 'lax',
       secure: NODE_ENV === 'production',
     })
 
-    return c.redirect(`${browserProtocol}://${salePointId}.${proxyDomain()}/boss/`)
+    return redirect(`${browserProtocol}://${salePointId}.${proxyDomain()}/boss/`)
   }
   catch (error) {
-    if (error instanceof Exception)
-      return returnHonoError(c, error)
+    if (error instanceof Exception) {
+      return returnError(error)
+    }
 
     console.error('Unexpected error:', error)
-    return c.json({ message: 'Unexpected error' }, 502)
+    return NextResponse.json({ message: 'Unexpected error' }, { status: 502 })
   }
 }
