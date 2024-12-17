@@ -1,0 +1,1 @@
+ALTER TABLE `sale_point_credentials` DROP COLUMN `email`;

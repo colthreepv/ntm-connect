@@ -6,7 +6,7 @@ export default {
     url: 'file:../../sqlite/database.sqlite3',
   },
   out: './src/migrations',
-  schema: './src/database.schema.ts',
+  schema: './src/database/database.schema.ts',
   migrations: {
     table: 'migrations',
   },

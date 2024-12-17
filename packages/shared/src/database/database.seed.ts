@@ -50,7 +50,25 @@ async function initSalePoints() {
     password: item.password,
     publicIp: item.publicIp,
     storeFullName: item.storeFullName,
-    email: item.email,
+    username: item.username,
+  }))
+
+  console.log('Inserting records...')
+  await db.insert(salePointCredentials).values(records)
+  console.log('Seed completed successfully.')
+}
+
+async function additionalSalePoints(name: string) {
+  const jsonData = JSON.parse(readFileSync(resolve(__dirname, `../../bootstrap/${name}.json`), 'utf8'))
+
+  const records = jsonData.map((item: any) => ({
+    id: generateCustomId(item),
+    company: item.company,
+    storeId: item.storeId,
+    deviceType: item.deviceType,
+    password: item.password,
+    publicIp: item.publicIp,
+    storeFullName: item.storeFullName,
     username: item.username,
   }))
 
@@ -66,6 +84,7 @@ interface SeedMigration {
 
 const seeds: Array<SeedMigration> = [
   { name: 'first_batch_of_sale_points', fn: initSalePoints },
+  { name: 'additional_sale_points_17dec2024', fn: async () => additionalSalePoints('17dec2024') },
 ]
 
 runSeed(seeds).catch((error) => {

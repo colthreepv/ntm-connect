@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import type { LibSQLDatabase } from 'drizzle-orm/libsql'
 
-import { sql } from 'drizzle-orm'
 import { pingStats, salePointCredentials } from '../src/database/database.schema.js'
 import { findDeadDevices, findResurrectedDevices } from '../src/database/devices.query.js'
 import { setupTestDatabase } from './test-database.js'
@@ -22,7 +21,6 @@ describe('findDeadDevices', () => {
         publicIp: '192.168.1.1',
         username: 'testuser1',
         password: 'password1',
-        email: 'test1@example.com',
       },
       {
         id: 'test-device-2',
@@ -33,7 +31,6 @@ describe('findDeadDevices', () => {
         publicIp: '192.168.1.2',
         username: 'testuser2',
         password: 'password2',
-        email: 'test2@example.com',
       },
     ])
 
@@ -88,7 +85,6 @@ describe('findResurrectedDevices', () => {
         publicIp: '192.168.1.1',
         username: 'testuser1',
         password: 'password1',
-        email: 'test1@example.com',
       },
       {
         id: 'test-device-2',
@@ -99,7 +95,6 @@ describe('findResurrectedDevices', () => {
         publicIp: '192.168.1.2',
         username: 'testuser2',
         password: 'password2',
-        email: 'test2@example.com',
       },
     ])
 
