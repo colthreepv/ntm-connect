@@ -1,5 +1,4 @@
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { Exception, createException } from '@ntm-connect/shared/exception'
 import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
 import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
@@ -61,7 +60,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ salePo
       secure: NODE_ENV === 'production',
     })
 
-    return redirect(`${browserProtocol}://${salePointId}.${proxyDomain()}/boss/`)
+    return NextResponse.redirect(`${browserProtocol}://${salePointId}.${proxyDomain()}/boss/`)
   }
   catch (error) {
     if (error instanceof Exception) {

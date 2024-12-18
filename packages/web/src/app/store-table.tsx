@@ -337,7 +337,7 @@ export default function StoreTable() {
                 <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
                   {salePoints.map(salePoint => (
                     <tr
-                      key={salePoint.storeId}
+                      key={`${salePoint.company}-${salePoint.storeId}`}
                       className="cursor-pointer bg-white hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-800"
                       onClick={() => handleRowClick(salePoint)}
                     >

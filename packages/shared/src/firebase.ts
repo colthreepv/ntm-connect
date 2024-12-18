@@ -1,5 +1,5 @@
-import type { ServiceAccount } from 'firebase-admin/app'
-import { cert, initializeApp } from 'firebase-admin/app'
+import type { App, ServiceAccount } from 'firebase-admin/app'
+import { cert, getApp, initializeApp } from 'firebase-admin/app'
 import type { DecodedIdToken } from 'firebase-admin/auth'
 import { getAuth } from 'firebase-admin/auth'
 import type { Context } from 'hono'
@@ -15,9 +15,15 @@ const serviceAccount: ServiceAccount = {
   privateKey: parsedPrivateKey,
 }
 
-const firebaseAdminApp = initializeApp({
-  credential: cert(serviceAccount),
-})
+let firebaseAdminApp: App
+try {
+  firebaseAdminApp = getApp('ntm-connect')
+}
+catch {
+  firebaseAdminApp = initializeApp({
+    credential: cert(serviceAccount),
+  }, 'ntm-connect')
+}
 
 export const firebaseAdminAuth = getAuth(firebaseAdminApp)
 
