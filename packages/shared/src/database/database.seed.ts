@@ -40,7 +40,7 @@ async function runSeed(seeds: Array<SeedMigration>) {
 }
 
 async function initSalePoints() {
-  const jsonData = JSON.parse(readFileSync(resolve(__dirname, '../../bootstrap/data.json'), 'utf8'))
+  const jsonData = JSON.parse(readFileSync(resolve(__dirname, '../../../bootstrap/data.json'), 'utf8'))
 
   const records = jsonData.map((item: any) => ({
     id: generateCustomId(item),
@@ -59,7 +59,7 @@ async function initSalePoints() {
 }
 
 async function additionalSalePoints(name: string) {
-  const jsonData = JSON.parse(readFileSync(resolve(__dirname, `../../bootstrap/${name}.json`), 'utf8'))
+  const jsonData = JSON.parse(readFileSync(resolve(__dirname, `../../../bootstrap/${name}.json`), 'utf8'))
 
   const records = jsonData.map((item: any) => ({
     id: generateCustomId(item),
