@@ -3,5 +3,6 @@
   "files.associations": {
     "**/.env*": "plaintext",
     "**/*.env*": "plaintext"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
