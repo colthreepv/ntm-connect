@@ -12,3 +12,4 @@ const dbPath = resolve(projectRoot, 'sqlite', 'database.sqlite3')
 const db = drizzle(createClient({ url: `file:${dbPath}` }))
 
 export { db }
+export { sql } from 'drizzle-orm'
