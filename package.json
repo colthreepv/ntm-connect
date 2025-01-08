@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "clean": "pnpm run -r clean",
-    "dev": "pnpm run -F web2 -F app -F proxy dev",
+    "dev": "pnpm run -F web -F app -F proxy dev",
     "build": "pnpm run -r build",
     "build:web": "pnpm run --filter web build",
     "build:backend": "pnpm run --filter shared --filter proxy build",

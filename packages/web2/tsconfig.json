@@ -1,8 +1,0 @@
-{
-  "extends": "@total-typescript/tsconfig/tsc/no-dom/app",
-  "compilerOptions": {
-    "noUncheckedIndexedAccess": false, // yes, it's formally correct, but so strict, I would litter my code with hashbangs
-    "outDir": "dist"
-  },
-  "include": ["**/*.ts"]
-}
