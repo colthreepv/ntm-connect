@@ -4,6 +4,16 @@ import { cleanEnv, str } from 'envalid'
 export const env = cleanEnv(nodeEnv, {
   NODE_ENV: str({ choices: ['production', 'development'], default: 'development' }),
   DOMAIN: str({ default: 'ntm-connect.local' }),
+  // inherited from shared
+  FIREBASE_PROJECT_ID: str(),
+  FIREBASE_CLIENT_EMAIL: str(),
+  FIREBASE_PRIVATE_KEY: str(),
+  // app specific
+  APP_FIREBASE_API_KEY: str(),
+  APP_FIREBASE_AUTH_DOMAIN: str(),
+  APP_FIREBASE_STORAGE_BUCKET: str(),
+  APP_FIREBASE_MESSAGING_SENDER_ID: str(),
+  APP_FIREBASE_APP_ID: str(),
 })
 
 export function serverDomain(): string {

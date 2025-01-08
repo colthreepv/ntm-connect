@@ -1,8 +1,8 @@
 import type { FirebaseError } from 'firebase/app'
-import { type User, signOut as firebaseSignOut, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
-import { firebaseAuth } from './firebase'
-import { NODE_ENV } from '@/config'
+import { env } from '@/config'
 import { createAuthStore } from '@/store/utils.zustand'
+import { signOut as firebaseSignOut, onAuthStateChanged, signInWithEmailAndPassword, type User } from 'firebase/auth'
+import { firebaseAuth } from './firebase'
 
 interface AuthState {
   user: User | null
@@ -49,7 +49,7 @@ export const useAuthStore = createAuthStore<AuthStore>(
       return await user.getIdToken()
     },
   }),
-  { name: 'auth-store', enabled: NODE_ENV === 'development' },
+  { name: 'auth-store', enabled: env.mode === 'development' },
 )
 
 // Initialize the listener for auth state changes

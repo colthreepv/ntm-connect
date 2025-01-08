@@ -1,22 +1,45 @@
-import { z } from 'zod'
+import type { AppEnv, VITE_ENV } from '@ntm-connect/shared/web-environment'
 
-export const NODE_ENV = z
-  .enum(['development', 'test', 'production'])
-  .default('development')
-  .parse(import.meta.env.MODE)
+declare global {
+  interface Window {
+    __APP_ENV: AppEnv
+  }
+}
+
+function getEnv(): AppEnv {
+  const mode = import.meta.env.MODE as VITE_ENV
+  if (mode === 'production') {
+    return window.__APP_ENV
+  }
+
+  // fallback to import.meta for dev
+  return {
+    mode: import.meta.env.MODE as VITE_ENV,
+    firebase: {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    },
+  } satisfies AppEnv
+}
+
+export const env = getEnv()
 
 function getDomain(): string {
-  if (NODE_ENV === 'development') {
+  if (env.mode === 'development') {
     return 'ntm-connect.local'
   }
   return window.location.hostname
 }
 
-export const browserProtocol = NODE_ENV === 'production' ? 'https' : 'http'
+export const browserProtocol = env.mode === 'production' ? 'https' : 'http'
 
 export function serverDomain(): string {
   const domain = getDomain()
-  return NODE_ENV === 'production' ? domain : `${domain}:3000`
+  return env.mode === 'production' ? domain : `${domain}:3000`
 }
 
 export function cookieDomain(): string {
@@ -25,7 +48,7 @@ export function cookieDomain(): string {
 
 export function proxyDomain(): string {
   const domain = getDomain()
-  return NODE_ENV === 'production' ? domain : `${domain}:3004`
+  return env.mode === 'production' ? domain : `${domain}:3004`
 }
 
 export const sessionExpiry = 60 * 60 * 24 * 2 // 2 days

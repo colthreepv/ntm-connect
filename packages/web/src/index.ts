@@ -1,14 +1,19 @@
+import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { serve } from '@hono/node-server'
-import { getSalePoints } from './sale-point.api.js'
-import { createSession } from './create-session/index.js'
 import { env } from './config.js'
+import { createSession } from './create-session/index.js'
+import { pages } from './pages.js'
+import { getSalePoints } from './sale-point.api.js'
 
-const app = new Hono().basePath('/api')
-app.use('*', cors({ origin: '*' }))
-app.get('/sale-points', getSalePoints)
-app.get('/prepare-route/:salePointId/:jwt', createSession)
+const api = new Hono()
+api.use('*', cors({ origin: '*' }))
+api.get('/sale-points', getSalePoints)
+api.get('/prepare-route/:salePointId/:jwt', createSession)
+
+const app = new Hono()
+app.route('/api', api)
+app.route('/', pages)
 
 const port = 3000
 
