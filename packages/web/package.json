@@ -3,6 +3,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "clean": "rimraf dist",
     "build": "pnpm clean && tsc"
