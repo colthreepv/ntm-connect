@@ -1,4 +1,4 @@
-# ntm-deviceportal
+# ntm-connect
 
 ## Design
 

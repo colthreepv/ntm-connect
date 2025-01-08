@@ -47,7 +47,7 @@ function renderIndex(c: Context) {
 
 if (env.NODE_ENV === 'production') {
   pages.use('/assets/*', serveStatic({ root: relativeDist }))
-  pages.get('/', renderIndex)
+  pages.get('/*', renderIndex)
   pages.get('/index.html', renderIndex)
 }
 

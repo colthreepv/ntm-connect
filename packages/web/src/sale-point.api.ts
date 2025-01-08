@@ -1,9 +1,9 @@
 import type { Context } from 'hono'
-import { Exception, returnHonoError } from '@ntm-connect/shared/exception'
 import { db, sql } from '@ntm-connect/shared/database'
+import { Exception, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateJwt } from '@ntm-connect/shared/firebase'
 
-export async function getSalePointsWithStatus(limit = 100) {
+export async function getSalePointsWithStatus(limit = 500) {
   const query = sql`
     WITH ranked_pings AS (
       SELECT
