@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react'
-import { useModalStore } from '@/store/modal.store'
 import ReactModal from 'react-modal'
+import { useModalStore } from '@/store/modal.store'
 
-ReactModal.setAppElement('#app')
+ReactModal.setAppElement('#root')
 
 type ModalProps = PropsWithChildren<{
   title?: string

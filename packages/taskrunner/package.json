@@ -3,7 +3,6 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "echo 'just call pnpm exec tsx src/job.ts' && exit 1",
     "clean": "rimraf dist",
     "build": "pnpm clean && tsc"
   },

@@ -1,6 +1,6 @@
-import { NODE_ENV } from '@/config'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { NODE_ENV } from '@/config'
 
 interface ModalState {
   isOpen: boolean

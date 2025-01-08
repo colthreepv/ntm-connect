@@ -1,5 +1,5 @@
-import { create, type StateCreator } from 'zustand'
-import { devtools, type DevtoolsOptions } from 'zustand/middleware'
+import { type StateCreator, create } from 'zustand'
+import { type DevtoolsOptions, devtools } from 'zustand/middleware'
 
 export type GenericStoreCreator<T> = StateCreator<T, [], []>
 
