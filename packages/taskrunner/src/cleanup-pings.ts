@@ -8,13 +8,14 @@ async function cleanupOldPings() {
   const result = await db.run(sql`
     WITH ranked_pings AS (
       SELECT 
-        id,
-        ROW_NUMBER() OVER (PARTITION BY sale_point_id ORDER BY created_at DESC) as rn
+        sale_point_id,
+        timestamp,
+        ROW_NUMBER() OVER (PARTITION BY sale_point_id ORDER BY timestamp DESC) as rn
       FROM ping_stats
     )
     DELETE FROM ping_stats 
-    WHERE id IN (
-      SELECT id FROM ranked_pings WHERE rn > 10
+    WHERE (sale_point_id, timestamp) IN (
+      SELECT sale_point_id, timestamp FROM ranked_pings WHERE rn > 10
     )
   `)
 
