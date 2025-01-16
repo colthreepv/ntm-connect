@@ -1,7 +1,7 @@
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { consola } from 'consola'
 import Bree from 'bree'
+import { consola } from 'consola'
 import { startBot } from './alert-bot.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -13,8 +13,11 @@ const bree = new Bree({
   jobs: [{
     name: 'ping-devices',
     interval: 'every 10 minute',
+  }, {
+    name: 'cleanup-pings',
+    interval: 'every 1 hour',
   }],
 })
 
 void startBot()
-await bree.start()
+void bree.start()

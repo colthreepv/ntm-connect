@@ -1,6 +1,6 @@
-import { parentPort } from 'node:worker_threads'
-import { exit as processExit } from 'node:process'
 import type { RequestOptions } from 'node:https'
+import { exit as processExit } from 'node:process'
+import { parentPort } from 'node:worker_threads'
 import { db } from '@ntm-connect/shared/database'
 import { pingStats, salePointCredentials } from '@ntm-connect/shared/database.schema'
 import { httpsRequest } from '@ntm-connect/shared/request'
