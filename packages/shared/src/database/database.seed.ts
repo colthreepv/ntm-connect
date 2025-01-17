@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { exit } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { eq } from 'drizzle-orm'
-import { salePointCredentials, seedTracker } from './database.schema.js'
 import { db } from './database.js'
+import { salePointCredentials, seedTracker } from './database.schema.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

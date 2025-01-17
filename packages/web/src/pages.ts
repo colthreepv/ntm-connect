@@ -19,7 +19,7 @@ const packageDir = join(__dirnameVal, '..')
 const relativeDist = relative(packageDir, distDir)
 
 const indexPath = join(distDir, 'index.html')
-const rawHtml = readFileSync(indexPath, 'utf-8')
+let rawHtml = ''
 
 function renderIndex(c: Context) {
   const appEnv: AppEnv = {
@@ -46,6 +46,7 @@ function renderIndex(c: Context) {
 }
 
 if (env.NODE_ENV === 'production') {
+  rawHtml = readFileSync(indexPath, 'utf-8')
   pages.use('/assets/*', serveStatic({ root: relativeDist }))
   pages.get('/*', renderIndex)
   pages.get('/index.html', renderIndex)

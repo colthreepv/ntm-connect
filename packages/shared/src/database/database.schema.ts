@@ -8,6 +8,7 @@ export const salePointCredentials = sqliteTable('sale_point_credentials', {
   storeFullName: text('storeFullName').notNull(),
   deviceType: text('deviceType').notNull(),
   publicIp: text('publicIp').notNull(),
+  port: integer('port').default(80).notNull(),
   username: text('username').notNull(),
   password: text('password').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),

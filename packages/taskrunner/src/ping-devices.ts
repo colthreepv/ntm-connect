@@ -8,7 +8,7 @@ import { consola } from 'consola'
 
 const TIMEOUT_IN_SECONDS = 5
 
-async function pingDevice(salePoint: { id: string, publicIp: string }) {
+async function pingDevice(salePoint: { id: string, publicIp: string, port: number }) {
   const controller = new AbortController()
   const requestTimeout = setTimeout(() => {
     controller.abort()
@@ -18,6 +18,7 @@ async function pingDevice(salePoint: { id: string, publicIp: string }) {
 
   const options: RequestOptions = {
     hostname: salePoint.publicIp,
+    port: salePoint.port,
     path: '/boss/',
     method: 'HEAD',
     rejectUnauthorized: false, // Ignore self-signed certificate warnings
@@ -67,6 +68,7 @@ async function pingAllDevices() {
     .select({
       id: salePointCredentials.id,
       publicIp: salePointCredentials.publicIp,
+      port: salePointCredentials.port,
     })
     .from(salePointCredentials)
 

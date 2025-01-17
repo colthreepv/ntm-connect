@@ -1,12 +1,12 @@
+import type { Context } from 'hono'
+import type { StatusCode } from 'hono/utils/http-status'
 import type { RequestOptions } from 'node:https'
 import { Buffer } from 'node:buffer'
-import type { Context } from 'hono'
-import { getCookie } from 'hono/cookie'
-import type { StatusCode } from 'hono/utils/http-status'
-import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
+import { createException, Exception, returnHonoError } from '@ntm-connect/shared/exception'
 import { validateSession } from '@ntm-connect/shared/firebase'
-import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
 import { httpsRequest } from '@ntm-connect/shared/request'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
+import { getCookie } from 'hono/cookie'
 import { browserProtocol, env, proxyDomain } from './config.js'
 
 const forbiddenReqHeaders = ['host', 'connection']
@@ -50,6 +50,7 @@ export async function proxyEndpoint(c: Context) {
 
     const options: RequestOptions = {
       hostname: credentials.publicIp,
+      port: credentials.port,
       path: requestUrl,
       method: c.req.method,
       headers: reqHeaders,
@@ -66,7 +67,7 @@ export async function proxyEndpoint(c: Context) {
     // Replace REFERER header with original domain
     const referer = c.req.header('referer')
     if (referer != null) {
-      reqHeaders.referer = referer.replace(`${browserProtocol}://${salePointId}.${proxyDomain}`, `https://${credentials.publicIp}`)
+      reqHeaders.referer = referer.replace(`${browserProtocol}://${salePointId}.${proxyDomain}`, `https://${credentials.publicIp}:${credentials.port}`)
     }
 
     const requestBodyBuffer = Buffer.from(await c.req.arrayBuffer())
@@ -75,7 +76,7 @@ export async function proxyEndpoint(c: Context) {
     if (proxyRes.statusCode === 301 || proxyRes.statusCode === 302) {
       if (proxyRes.headers.location == null)
         throw new MalformedDeviceRequest({ reason: 'Missing Location header on redirect' })
-      const newLocation = proxyRes.headers.location?.replace(`https://${credentials.publicIp}`, `${browserProtocol}://${salePointId}.${proxyDomain}`)
+      const newLocation = proxyRes.headers.location?.replace(`https://${credentials.publicIp}:${credentials.port}`, `${browserProtocol}://${salePointId}.${proxyDomain}`)
       return c.redirect(newLocation)
     }
 

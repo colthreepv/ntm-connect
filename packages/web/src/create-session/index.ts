@@ -1,9 +1,9 @@
 import type { Context } from 'hono'
-import { setCookie } from 'hono/cookie'
-import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
+import { createException, Exception, returnHonoError } from '@ntm-connect/shared/exception'
 import { firebaseAdminAuth } from '@ntm-connect/shared/firebase'
-import { Exception, createException, returnHonoError } from '@ntm-connect/shared/exception'
-import { NODE_ENV, browserProtocol, cookieDomain, proxyDomain, sessionExpiry } from '../config.js'
+import { fetchSalePointCredentials } from '@ntm-connect/shared/sale-point'
+import { setCookie } from 'hono/cookie'
+import { browserProtocol, cookieDomain, NODE_ENV, proxyDomain, sessionExpiry } from '../config.js'
 
 import { getJSessionFromDevice } from './device.js'
 
@@ -28,7 +28,7 @@ export async function createSession(c: Context) {
 
     let deviceCookie: { name: string, value: string, path: string }
     try {
-      deviceCookie = await getJSessionFromDevice(credentials.publicIp, credentials.username, credentials.password)
+      deviceCookie = await getJSessionFromDevice(credentials.publicIp, credentials.port, credentials.username, credentials.password)
     }
     catch (error) {
       console.error('Unable to login on device:', error)

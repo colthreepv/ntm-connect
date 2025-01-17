@@ -16,6 +16,9 @@ const bree = new Bree({
   }, {
     name: 'cleanup-pings',
     interval: 'every 1 hour',
+  }, {
+    name: 'vacuum-db',
+    interval: 'every 1 day',
   }],
 })
 

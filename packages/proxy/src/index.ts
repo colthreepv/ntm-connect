@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
+import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { env } from './config.js'
 import { proxyEndpoint } from './proxy.api.js'

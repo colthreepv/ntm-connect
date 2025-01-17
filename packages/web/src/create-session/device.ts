@@ -1,5 +1,5 @@
-import { Buffer } from 'node:buffer'
 import type { RequestOptions } from 'node:https'
+import { Buffer } from 'node:buffer'
 import { createException } from '@ntm-connect/shared/exception'
 import { httpsRequest } from '@ntm-connect/shared/request'
 
@@ -12,7 +12,7 @@ export interface SessionCookie {
 const DeviceLoginError = createException('Unable to login on device', 'DEVICE_UTILS_01')
 const JSessionParseError = createException('Failed to parse JSESSIONID cookie', 'DEVICE_UTILS_02')
 
-export async function getJSessionFromDevice(ip: string, username: string, password: string): Promise<SessionCookie> {
+export async function getJSessionFromDevice(ip: string, port: number, username: string, password: string): Promise<SessionCookie> {
   const loginUrl = `/boss/servlet/login`
   const formData = new URLSearchParams({
     txtUser: username,
@@ -34,6 +34,7 @@ export async function getJSessionFromDevice(ip: string, username: string, passwo
 
   const options: RequestOptions = {
     hostname: ip,
+    port,
     path: loginUrl,
     method: 'POST',
     headers: {
